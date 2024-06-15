@@ -1,0 +1,111 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #0d0d0d;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+header {
+    width: 100%;
+    background: #1c1c1c;
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+header h1 {
+    font-family: 'Orbitron', sans-serif;
+    color: #00ffcc;
+    font-size: 32px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.dashboard-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    width: 100%;
+    padding: 20px;
+}
+
+.dashboard-box {
+    background: #1b1b1b;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    width: 100%;
+    max-width: 800px; /* Increased max-width for larger screens */
+    display: flex;
+    flex-wrap: wrap; /* Enable wrapping */
+    justify-content: space-around; /* Distribute items evenly with spacing around */
+}
+
+.btn {
+    width: calc(50% - 20px); /* Each button takes up 50% of the container width minus margin */
+    padding: 20px;
+    background: #00ffcc;
+    color: #0d0d0d;
+    text-transform: uppercase;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+    margin-bottom: 20px; /* Spacing below each button */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add subtle shadow for depth */
+    font-size: 18px; /* Adjust font size for better readability */
+}
+
+.btn:hover {
+    background: #00ccaa;
+    transform: translateY(-3px); /* Lift the button slightly on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Adjust shadow on hover */
+}
+
+.locked-btn {
+    background: #333; /* Dark background to indicate locked state */
+    color: #999; /* Light text to indicate disabled state */
+    cursor: not-allowed; /* Show not-allowed cursor */
+    pointer-events: none; /* Disable pointer events */
+    opacity: 0.7; /* Reduced opacity for visual indication */
+}
+
+.scrolling-text {
+    background-color: #ff0000; /* Red background */
+    padding: 10px 0; /* Padding above and below the scrolling text */
+    width: 100%;
+}
+
+.warning-text {
+    font-weight: bold;
+    color: #000000; /* Black text */
+}
+
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 28px; /* Decrease font size for smaller screens */
+    }
+
+    .dashboard-box {
+        padding: 20px;
+    }
+
+    .btn {
+        width: 100%; /* Full width buttons on smaller screens */
+        margin-bottom: 15px; /* Adjust margin for smaller screens */
+        font-size: 16px; /* Further decrease font size for smaller screens */
+    }
+}

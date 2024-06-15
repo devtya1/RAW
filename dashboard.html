@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>Research and Analysis Wing</h1>
+    </header>
+    <div class="dashboard-container">
+        <div class="dashboard-box">
+            <button onclick="chat();" id="button1" class="btn">Chats</button>
+            <button id="button2" class="btn">Weapons</button>
+            <button id="button3" class="btn">Morse Code</button>
+            <button id="button4" class="btn locked-btn" disabled>Button 4 (Locked)</button>
+            <button id="button5" class="btn locked-btn" disabled>Button 5 (Locked)</button>
+        </div>
+    </div>
+    <div class="scrolling-text">
+        <marquee behavior="scroll" direction="left">
+            <span class="warning-text">This is a Government website. Any changes made unofficially will lead to imprisonment! and This is a INDIAN Government website and has all copyrights 🇮🇳</span>
+        </marquee>
+    </div>
+
+    <script>
+        function chat(){
+            window.location = "chat.html";
+        }
+    </script>
+</body>
+</html>
