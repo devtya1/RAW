@@ -4,17 +4,165 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Government Chat</title>
-    <link rel="stylesheet" href="chat.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
-    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
-
-    <!-- Add Firebase products that you want to use -->
-    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js"></script>
-
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #222;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        header {
+            background-color: #1a1a1a;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 16px;
+            width: 100%;
+            color: black;
+            background-color: white;
+            font-weight: bold;
+            word-wrap: break-word;
+        }
+        .chat-input {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        input, textarea {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            outline: none;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        textarea {
+            resize: none;
+            height: 60px;
+        }
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #1a1a1a;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        button:disabled {
+            background-color: #333;
+            cursor: not-allowed;
+        }
+        .scrolling-text {
+            background-color: red;
+            color: black;
+            font-weight: bold;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .warning-text {
+            display: inline-block;
+        }
+        @media (min-width: 600px) {
+            .chat-input {
+                flex-direction: row;
+                align-items: center;
+            }
+            input {
+                flex: 1;
+                margin-right: 10px;
+            }
+            textarea {
+                flex: 3;
+                margin-right: 10px;
+            }
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyDN7r1ikI-ylmx4rtYMf6g-G2uYtsFxIUg",
+            authDomain: "chat-raw.firebaseapp.com",
+            databaseURL: "https://chat-raw-default-rtdb.firebaseio.com",
+            projectId: "chat-raw",
+            storageBucket: "chat-raw.appspot.com",
+            messagingSenderId: "762895654305",
+            appId: "1:762895654305:web:76a3989d55f196806fbfe0"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        function load() {
+            const messagesRef = firebase.database().ref('messages');
+            messagesRef.on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                displayMessage(message.to, message.message, message.from);
+            });
+        }
+        
+        function send() {
+            const to = document.getElementById('chatTo').value;
+            const message = document.getElementById('chatMessage').value;
+            const from = localStorage.getItem("RAW") || "Anonymous";
+            
+            if (to && message && from) {
+                const newMessage = {
+                    to,
+                    message,
+                    from
+                };
+                
+                firebase.database().ref('messages').push(newMessage);
+                
+                // Clear input fields
+                document.getElementById('chatTo').value = '';
+                document.getElementById('chatMessage').value = '';
+            }
+        }
+        
+        function displayMessage(to, message, from) {
+            const messagesDiv = document.getElementById('chatBox');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerHTML = 'Message: ' + message + '<br> From: ' + from + ' &nbsp; to: ' + to;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+    </script>
 </head>
-<body>
+<body onload="load();">
     <header>
         <h1>Research and Analysis Wing</h1>
     </header>
@@ -25,16 +173,13 @@
         <div class="chat-input">
             <input type="text" id="chatTo" placeholder="To (e.g., User123)" required>
             <textarea id="chatMessage" placeholder="Type your message..." required></textarea>
-            <button id="sendButton">Send</button>
+            <button onclick="send();" id="sendButton">Send</button>
         </div>
     </div>
     <div class="scrolling-text">
         <marquee behavior="scroll" direction="left">
-            <span class="warning-text">This is a Government website. Any changes made unofficially will lead to imprisonment!  and This is a INDIAN Government website and has all copyrights 🇮🇳</span>
+            <span class="warning-text">This is a Government website. Any changes made unofficially will lead to imprisonment! This is an INDIAN Government website and has all copyrights 🇮🇳</span>
         </marquee>
     </div>
-    <script src="chat.js">
-        
-    </script>
 </body>
 </html>
