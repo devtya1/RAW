@@ -111,11 +111,12 @@
 
         function endMorse() {
             pressDuration = new Date().getTime() - pressStartTime;
-            if (pressDuration < 200) {
+            if (pressDuration < 500) {
                 morseCode += '.';
             } else {
                 morseCode += '-';
             }
+            document.getElementById('result').innerText = morseMessage + morseCode; // Show current code being entered
         }
 
         function addLetterSpace() {
