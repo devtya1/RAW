@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    if(localStorage.getItem("Name") == "Saharsh"){
+    if(localStorage.getItem("RAW") == "rag0730"){
         window.location.href = 'training.html';
     }else{
     // Wait for 5 seconds
