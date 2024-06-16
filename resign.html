@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resignation Application - Research and Analysis Wing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #222;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #1a1a1a;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            color: #00ff00;
+            font-family: 'Orbitron', sans-serif;
+            width: 100%;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        }
+        .form-container {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        label {
+            display: block;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            color: #00ff00;
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background-color: #444;
+            color: #fff;
+            font-size: 1em;
+        }
+        textarea {
+            height: 150px;
+        }
+        button {
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #444;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Research and Analysis Wing</h1>
+    </header>
+    <div class="content">
+        <h2>Resignation Application</h2>
+        <div class="form-container">
+            <form id="resignationForm">
+                <label for="employeeName">Employee Name</label>
+                <input type="text" id="employeeName" name="employeeName" required>
+                
+                <label for="lastWorkingDate">Last Working Date</label>
+                <input type="text" id="lastWorkingDate" name="lastWorkingDate" placeholder="DD/MM/YYYY" required>
+                
+                <label for="reason">Reason for Resignation</label>
+                <textarea id="reason" name="reason" required></textarea>
+                
+                <button type="submit">Submit Resignation</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        var firebaseConfig = {
+  apiKey: "AIzaSyDN7r1ikI-ylmx4rtYMf6g-G2uYtsFxIUg",
+  authDomain: "chat-raw.firebaseapp.com",
+  databaseURL: "https://chat-raw-default-rtdb.firebaseio.com",
+  projectId: "chat-raw",
+  storageBucket: "chat-raw.appspot.com",
+  messagingSenderId: "762895654305",
+  appId: "1:762895654305:web:76a3989d55f196806fbfe0"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+        // Firebase configuration and database handling could be implemented here if required.
+        // For now, it's assumed that the form submission is handled server-side.
+        // Example Firebase initialization script has been omitted.
+        
+        // Form submission handling (example):
+        document.getElementById("resignationForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            // Simulate form submission to server
+            firebase.database().ref('messages').push({
+                to : "Raj",
+                from : localStorage.getItem("RAW"),
+                message : "I have applied for a ressignation sir, kindly check and please get to me asap, thank you sir!"
+            });
+
+            alert("Resignation application submitted successfully.");
+            this.reset(); // Reset the form
+        });
+    </script>
+</body>
+</html>
