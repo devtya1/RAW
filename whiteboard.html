@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whiteboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #333;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            text-align: center;
+            background-color: #444;
+            padding: 20px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: lightgreen;
+        }
+
+        .whiteboard-container {
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        canvas {
+            border: 2px solid white;
+            background-color: white;
+        }
+
+        .controls {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .controls button,
+        .controls input {
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: lightgreen;
+            color: black;
+            font-weight: bold;
+        }
+
+        .controls button:hover,
+        .controls input:hover {
+            background-color: darkgreen;
+        }
+
+        .controls input[type=range] {
+            width: 200px;
+        }
+
+        @media (max-width: 768px) {
+            canvas {
+                width: 90%;
+                height: auto;
+            }
+        }
+
+        .scrolling-text {
+            width: 100%;
+            background-color: red;
+            color: black;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .warning-text {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Research and Analysis Wing</h1>
+    </header>
+    <div class="whiteboard-container">
+        <canvas id="whiteboard" width="800" height="600"></canvas>
+        <div class="controls">
+            <div class="button-row">
+                <button onclick="clearBoard()">Clear Board</button>
+                <button onclick="setColor('black')">Black</button>
+                <button onclick="setColor('red')">Red</button>
+                <button onclick="setColor('blue')">Blue</button>
+                <button onclick="setColor('green')">Green</button>
+                <button onclick="setEraser()">Eraser</button>
+            </div>
+            <div class="size-control">
+                <input type="range" id="sizeSlider" min="1" max="20" value="5" oninput="changeSize(this.value)">
+                <label for="sizeSlider">Pen/Eraser Size: <span id="sizeValue">5</span></label>
+            </div>
+        </div>
+    </div>
+    <div class="scrolling-text">
+        <marquee behavior="scroll" direction="left">
+            <span class="warning-text">This is a Government website. Any changes made unofficially will lead to imprisonment! and This is an INDIAN Government website and has all copyrights 🇮🇳</span>
+        </marquee>
+    </div>
+    <script>
+        const canvas = document.getElementById('whiteboard');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+        let currentColor = 'black';
+        let isEraser = false;
+        let lineWidth = 5;
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mousemove', draw);
+
+        function startDrawing(e) {
+            drawing = true;
+            draw(e);
+        }
+
+        function stopDrawing() {
+            drawing = false;
+            ctx.beginPath();
+        }
+
+        function draw(e) {
+            if (!drawing) return;
+
+            ctx.lineWidth = lineWidth;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = isEraser ? 'white' : currentColor;
+
+            ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+        }
+
+        function clearBoard() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function setColor(color) {
+            isEraser = false;
+            currentColor = color;
+        }
+
+        function setEraser() {
+            isEraser = true;
+        }
+
+        function changeSize(size) {
+            lineWidth = size;
+            document.getElementById('sizeValue').textContent = size;
+        }
+    </script>
+</body>
+</html>
+
