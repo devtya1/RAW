@@ -74,6 +74,13 @@
             margin-top: 20px;
             word-wrap: break-word; /* Ensure long words wrap */
         }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -82,9 +89,13 @@
     </header>
     <div class="content">
         <div class="telegraph">
-            <button id="telegraphButton" onmousedown="startMorse()" onmouseup="endMorse()">Press for Morse Code</button>
-            <button onclick="addLetterSpace()">Space (between letters)</button>
-            <button onclick="addWordSpace()">Space (between words)</button>
+            <div class="button-row">
+                <button id="telegraphButton" onmousedown="startMorse()" onmouseup="endMorse()">Press for Morse Code</button>
+                <button onclick="addLetterSpace()">Space (between letters)</button>
+                <button onclick="addWordSpace()">Space (between words)</button>
+                <button onclick="addDit()">Dit</button>
+                <button onclick="addDah()">Dah</button>
+            </div>
         </div>
         <div class="result" id="result"></div>
     </div>
@@ -132,6 +143,22 @@
                 morseCode = '';
             }
             morseMessage += ' / '; // Using '/' to indicate space between words
+            document.getElementById('result').innerText = morseMessage;
+        }
+
+        function addDit() {
+            morseCode += '.';
+            endTransmission();
+        }
+
+        function addDah() {
+            morseCode += '-';
+            endTransmission();
+        }
+
+        function endTransmission() {
+            morseMessage += (morseDict[morseCode] || '') + ' ';
+            morseCode = '';
             document.getElementById('result').innerText = morseMessage;
         }
     </script>
