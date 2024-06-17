@@ -39,15 +39,17 @@
             align-items: center;
             width: 100%;
             flex-grow: 1;
+            max-width: 800px; /* Limiting maximum width for larger screens */
+            overflow: hidden; /* Prevent canvas overflow */
         }
 
         canvas {
             border: 2px solid white;
             background-color: white;
             width: 100%;
-            max-width: 800px;
             height: auto;
             aspect-ratio: 4 / 3;
+            touch-action: none; /* Disable touch actions to prevent scrolling while drawing */
         }
 
         .controls {
@@ -144,17 +146,15 @@
         let lineWidth = 5;
 
         canvas.addEventListener('mousedown', startDrawing);
-        canvas.addEventListener('mouseup', stopDrawing);
         canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('touchstart', startDrawingTouch);
+        canvas.addEventListener('touchmove', drawTouch);
+        canvas.addEventListener('touchend', stopDrawing);
 
         function startDrawing(e) {
             drawing = true;
             draw(e);
-        }
-
-        function stopDrawing() {
-            drawing = false;
-            ctx.beginPath();
         }
 
         function draw(e) {
@@ -169,6 +169,23 @@
             ctx.stroke();
             ctx.beginPath();
             ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function stopDrawing() {
+            drawing = false;
+            ctx.beginPath();
+        }
+
+        function startDrawingTouch(e) {
+            e.preventDefault(); // Prevent scrolling while drawing
+            const touch = e.touches[0];
+            startDrawing(touch);
+        }
+
+        function drawTouch(e) {
+            e.preventDefault(); // Prevent scrolling while drawing
+            const touch = e.touches[0];
+            draw(touch);
         }
 
         function clearBoard() {
