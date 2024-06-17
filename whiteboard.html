@@ -15,6 +15,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
 
         header {
@@ -22,11 +23,13 @@
             text-align: center;
             background-color: #444;
             padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         h1 {
             font-family: 'Orbitron', sans-serif;
             color: lightgreen;
+            margin: 0;
         }
 
         .whiteboard-container {
@@ -34,11 +37,17 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            width: 100%;
+            flex-grow: 1;
         }
 
         canvas {
             border: 2px solid white;
             background-color: white;
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            aspect-ratio: 4 / 3;
         }
 
         .controls {
@@ -46,12 +55,15 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            width: 100%;
         }
 
         .button-row {
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 10px;
+            justify-content: center;
         }
 
         .controls button,
@@ -64,6 +76,7 @@
             background-color: lightgreen;
             color: black;
             font-weight: bold;
+            flex: 1;
         }
 
         .controls button:hover,
@@ -71,15 +84,16 @@
             background-color: darkgreen;
         }
 
-        .controls input[type=range] {
-            width: 200px;
+        .size-control {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
         }
 
-        @media (max-width: 768px) {
-            canvas {
-                width: 90%;
-                height: auto;
-            }
+        .controls input[type=range] {
+            width: 90%;
+            max-width: 400px;
         }
 
         .scrolling-text {
@@ -100,7 +114,7 @@
         <h1>Research and Analysis Wing</h1>
     </header>
     <div class="whiteboard-container">
-        <canvas id="whiteboard" width="800" height="600"></canvas>
+        <canvas id="whiteboard"></canvas>
         <div class="controls">
             <div class="button-row">
                 <button onclick="clearBoard()">Clear Board</button>
@@ -150,10 +164,11 @@
             ctx.lineCap = 'round';
             ctx.strokeStyle = isEraser ? 'white' : currentColor;
 
-            ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
             ctx.stroke();
             ctx.beginPath();
-            ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
         }
 
         function clearBoard() {
