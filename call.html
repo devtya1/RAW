@@ -67,7 +67,6 @@
             messagingSenderId: "762895654305",
             appId: "1:762895654305:web:76a3989d55f196806fbfe0"
         };
-
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
 
@@ -78,7 +77,7 @@
 
         let localStream;
         let peerConnection;
-        const roomId = 'my_room';
+        let roomId;
 
         const iceConfiguration = {
             iceServers: [
@@ -91,7 +90,33 @@
             audio: true
         };
 
-        startCallButton.addEventListener('click', async () => {
+        function createPeerConnection() {
+            peerConnection = new RTCPeerConnection(iceConfiguration);
+
+            peerConnection.onicecandidate = event => {
+                if (event.candidate) {
+                    firebase.database().ref('calls/' + roomId + '/iceCandidates').push(event.candidate.toJSON());
+                }
+            };
+
+            peerConnection.ontrack = event => {
+                if (!remoteVideo.srcObject) {
+                    remoteVideo.srcObject = event.streams[0];
+                }
+            };
+
+            peerConnection.oniceconnectionstatechange = () => {
+                if (peerConnection.iceConnectionState === 'disconnected') {
+                    console.log('Disconnected');
+                    peerConnection.close();
+                }
+            };
+        }
+
+        async function startCall() {
+            roomId = prompt("Enter a room ID to create:");
+            if (!roomId) return;
+
             startCallButton.disabled = true;
             joinCallButton.disabled = true;
 
@@ -113,9 +138,12 @@
                     sdp: offer.sdp
                 }
             });
-        });
+        }
 
-        joinCallButton.addEventListener('click', async () => {
+        async function joinCall() {
+            roomId = prompt("Enter the room ID to join:");
+            if (!roomId) return;
+
             startCallButton.disabled = true;
             joinCallButton.disabled = true;
 
@@ -143,29 +171,6 @@
                     }
                 });
             }
-        });
-
-        function createPeerConnection() {
-            peerConnection = new RTCPeerConnection(iceConfiguration);
-
-            peerConnection.onicecandidate = event => {
-                if (event.candidate) {
-                    firebase.database().ref('calls/' + roomId + '/iceCandidates').push(event.candidate.toJSON());
-                }
-            };
-
-            peerConnection.ontrack = event => {
-                if (!remoteVideo.srcObject) {
-                    remoteVideo.srcObject = event.streams[0];
-                }
-            };
-
-            peerConnection.oniceconnectionstatechange = () => {
-                if (peerConnection.iceConnectionState === 'disconnected') {
-                    console.log('Disconnected');
-                    peerConnection.close();
-                }
-            };
         }
 
         firebase.database().ref('calls/' + roomId + '/answer').on('value', async (snapshot) => {
@@ -178,6 +183,16 @@
         firebase.database().ref('calls/' + roomId + '/iceCandidates').on('child_added', async (snapshot) => {
             const candidate = new RTCIceCandidate(snapshot.val());
             await peerConnection.addIceCandidate(candidate);
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            startCallButton = document.getElementById('startCallButton');
+            joinCallButton = document.getElementById('joinCallButton');
+            localVideo = document.getElementById('localVideo');
+            remoteVideo = document.getElementById('remoteVideo');
+
+            startCallButton.addEventListener('click', startCall);
+            joinCallButton.addEventListener('click', joinCall);
         });
     </script>
 </head>
