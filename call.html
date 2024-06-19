@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Call</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #333;
+            color: #00ffcc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        header {
+            background-color: #444;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            color: #00ffcc;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00ffcc;
+            color: #333;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        video {
+            width: 300px;
+            height: 300px;
+            margin: 10px;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Research and Analysis Wing</h1>
+    </header>
+    <div class="container">
+        <div class="controls">
+            <button id="startCallButton">Start Call</button>
+            <button id="joinCallButton">Join Call</button>
+        </div>
+        <video id="localVideo" autoplay playsinline></video>
+        <video id="remoteVideo" autoplay playsinline></video>
+    </div>
+
+    <script>
+        const startCallButton = document.getElementById('startCallButton');
+        const joinCallButton = document.getElementById('joinCallButton');
+        const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
+
+        let localStream;
+        let peerConnection;
+
+        const iceConfiguration = {
+            iceServers: [
+                {
+                    urls: 'stun:stun.l.google.com:19302'
+                }
+            ]
+        };
+
+        const constraints = {
+            video: true,
+            audio: true
+        };
+
+        startCallButton.addEventListener('click', async () => {
+            startCallButton.disabled = true;
+            joinCallButton.disabled = true;
+
+            localStream = await navigator.mediaDevices.getUserMedia(constraints);
+            localVideo.srcObject = localStream;
+
+            createPeerConnection();
+
+            localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, localStream);
+            });
+
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+
+            localStorage.setItem('offer', JSON.stringify(offer));
+        });
+
+        joinCallButton.addEventListener('click', async () => {
+            startCallButton.disabled = true;
+            joinCallButton.disabled = true;
+
+            localStream = await navigator.mediaDevices.getUserMedia(constraints);
+            localVideo.srcObject = localStream;
+
+            createPeerConnection();
+
+            localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, localStream);
+            });
+
+            const offer = JSON.parse(localStorage.getItem('offer'));
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+
+            localStorage.setItem('answer', JSON.stringify(answer));
+        });
+
+        function createPeerConnection() {
+            peerConnection = new RTCPeerConnection(iceConfiguration);
+
+            peerConnection.onicecandidate = event => {
+                if (event.candidate) {
+                    console.log('New ICE candidate: ', event.candidate);
+                }
+            };
+
+            peerConnection.ontrack = event => {
+                if (!remoteVideo.srcObject) {
+                    remoteVideo.srcObject = event.streams[0];
+                }
+            };
+
+            peerConnection.oniceconnectionstatechange = () => {
+                if (peerConnection.iceConnectionState === 'disconnected') {
+                    console.log('Disconnected');
+                    peerConnection.close();
+                }
+            };
+        }
+
+        // Automatically set the answer when the page is loaded (for simplicity)
+        window.addEventListener('load', async () => {
+            const answer = JSON.parse(localStorage.getItem('answer'));
+            if (answer) {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+            }
+        });
+    </script>
+</body>
+</html>
