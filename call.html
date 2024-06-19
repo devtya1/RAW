@@ -43,6 +43,10 @@
             cursor: pointer;
             font-size: 1em;
         }
+        button:disabled {
+            background-color: #444;
+            cursor: not-allowed;
+        }
         video {
             width: 300px;
             height: 300px;
@@ -50,22 +54,23 @@
             background-color: #000;
         }
     </style>
-</head>
-<body>
-    <header>
-        <br><br><br><br>
-        <h1>Research and Analysis Wing</h1>
-    </header>
-    <div class="container">
-        <div class="controls">
-            <button id="startCallButton">Start Call</button>
-            <button id="joinCallButton">Join Call</button>
-        </div>
-        <video id="localVideo" autoplay playsinline></video>
-        <video id="remoteVideo" autoplay playsinline></video>
-    </div>
-
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script>
+        // Your Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyDN7r1ikI-ylmx4rtYMf6g-G2uYtsFxIUg",
+            authDomain: "chat-raw.firebaseapp.com",
+            databaseURL: "https://chat-raw-default-rtdb.firebaseio.com",
+            projectId: "chat-raw",
+            storageBucket: "chat-raw.appspot.com",
+            messagingSenderId: "762895654305",
+            appId: "1:762895654305:web:76a3989d55f196806fbfe0"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
         const startCallButton = document.getElementById('startCallButton');
         const joinCallButton = document.getElementById('joinCallButton');
         const localVideo = document.getElementById('localVideo');
@@ -73,12 +78,11 @@
 
         let localStream;
         let peerConnection;
+        const roomId = 'my_room';
 
         const iceConfiguration = {
             iceServers: [
-                {
-                    urls: 'stun:stun.l.google.com:19302'
-                }
+                { urls: 'stun:stun.l.google.com:19302' }
             ]
         };
 
@@ -103,7 +107,12 @@
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
 
-            localStorage.setItem('offer', JSON.stringify(offer));
+            firebase.database().ref('calls/' + roomId).set({
+                offer: {
+                    type: offer.type,
+                    sdp: offer.sdp
+                }
+            });
         });
 
         joinCallButton.addEventListener('click', async () => {
@@ -119,13 +128,21 @@
                 peerConnection.addTrack(track, localStream);
             });
 
-            const offer = JSON.parse(localStorage.getItem('offer'));
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+            const callRef = firebase.database().ref('calls/' + roomId);
+            const callData = (await callRef.get()).val();
+            if (callData && callData.offer) {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer));
 
-            const answer = await peerConnection.createAnswer();
-            await peerConnection.setLocalDescription(answer);
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
 
-            localStorage.setItem('answer', JSON.stringify(answer));
+                callRef.update({
+                    answer: {
+                        type: answer.type,
+                        sdp: answer.sdp
+                    }
+                });
+            }
         });
 
         function createPeerConnection() {
@@ -133,7 +150,7 @@
 
             peerConnection.onicecandidate = event => {
                 if (event.candidate) {
-                    console.log('New ICE candidate: ', event.candidate);
+                    firebase.database().ref('calls/' + roomId + '/iceCandidates').push(event.candidate.toJSON());
                 }
             };
 
@@ -151,13 +168,30 @@
             };
         }
 
-        // Automatically set the answer when the page is loaded (for simplicity)
-        window.addEventListener('load', async () => {
-            const answer = JSON.parse(localStorage.getItem('answer'));
+        firebase.database().ref('calls/' + roomId + '/answer').on('value', async (snapshot) => {
+            const answer = snapshot.val();
             if (answer) {
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
             }
         });
+
+        firebase.database().ref('calls/' + roomId + '/iceCandidates').on('child_added', async (snapshot) => {
+            const candidate = new RTCIceCandidate(snapshot.val());
+            await peerConnection.addIceCandidate(candidate);
+        });
     </script>
+</head>
+<body>
+    <header>
+        <h1>WebRTC Call</h1>
+    </header>
+    <div class="container">
+        <div class="controls">
+            <button id="startCallButton">Start Call</button>
+            <button id="joinCallButton">Join Call</button>
+        </div>
+        <video id="localVideo" autoplay playsinline></video>
+        <video id="remoteVideo" autoplay playsinline></video>
+    </div>
 </body>
 </html>
