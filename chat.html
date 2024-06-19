@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Government Chat</title>
-    <link rel="stylesheet" href="chat.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
     <style>
@@ -16,8 +15,6 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
             height: 100vh;
             overflow: hidden;
         }
@@ -26,143 +23,225 @@
             padding: 20px;
             text-align: center;
             font-size: 1.5em;
-            color: #00ff00;
+            color: #fff;
             font-family: 'Orbitron', sans-serif;
-            width: 100%;
-            position: fixed;
-            top: 0;
-            z-index: 1000;
-        }
-        .content {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-            padding-top: 80px;
-            box-sizing: border-box;
         }
         .chat-container {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end;
-            align-items: center;
-            width: 100%;
-            max-width: 600px;
-            background-color: #333;
+            justify-content: space-between;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            overflow-y: auto;
-            max-height: 70vh;
+            box-sizing: border-box;
         }
-        .chat-message {
-            background-color: #444;
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            background-color: #333;
             padding: 10px;
             border-radius: 5px;
-            margin: 5px 0;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 16px;
             width: 100%;
+            color: black;
+            background-color: white;
+            font-weight: bold;
             word-wrap: break-word;
         }
-        .chat-input-container {
-            display: flex;
-            width: 100%;
-            max-width: 600px;
-            margin-top: 20px;
-        }
         .chat-input {
-            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        h1{
+            color: #00ffcc;
+        }
+        input, textarea {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            outline: none;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        textarea {
+            resize: none;
+            height: 60px;
+        }
+        button {
             padding: 10px;
             border: none;
             border-radius: 5px;
-            font-size: 1em;
-            margin-right: 10px;
-        }
-        .send-button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #00ff00;
-            color: #000;
+            background-color: #1a1a1a;
+            color: #fff;
             cursor: pointer;
             font-size: 1em;
         }
-        .send-button:hover {
-            background-color: #00cc00;
+        button:disabled {
+            background-color: #333;
+            cursor: not-allowed;
+        }
+        .scrolling-text {
+            background-color: red;
+            color: black;
+            font-weight: bold;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .warning-text {
+            display: inline-block;
+        }
+        @media (min-width: 600px) {
+            .chat-input {
+                flex-direction: row;
+                align-items: center;
+            }
+            input {
+                flex: 1;
+                margin-right: 10px;
+            }
+            textarea {
+                flex: 3;
+                margin-right: 10px;
+            }
         }
     </style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyDN7r1ikI-ylmx4rtYMf6g-G2uYtsFxIUg",
+            authDomain: "chat-raw.firebaseapp.com",
+            databaseURL: "https://chat-raw-default-rtdb.firebaseio.com",
+            projectId: "chat-raw",
+            storageBucket: "chat-raw.appspot.com",
+            messagingSenderId: "762895654305",
+            appId: "1:762895654305:web:76a3989d55f196806fbfe0"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        var messageCount = 0;
+
+        function load() {
+            const messagesRef = firebase.database().ref('messages');
+            messagesRef.on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                displayMessage(message.to, message.message, message.from);
+            });
+            const uploadsRef = firebase.database().ref('uploads');
+            uploadsRef.on('child_added', (snapshot) => {
+                const uploads = snapshot.val();
+                displayMessage(uploads.to, uploads.message, uploads.from);
+            });
+        }
+        
+        function send() {
+            const to = document.getElementById('chatTo').value;
+            const from = localStorage.getItem("RAW");
+            const message = document.getElementById('chatMessage').value;
+            
+            if (to && message && from) {
+                const newMessage = {
+                    to,
+                    message,
+                    from
+                };
+                
+                firebase.database().ref('messages').push(newMessage);
+                
+                // Clear input fields
+                document.getElementById('chatTo').value = '';
+                document.getElementById('chatMessage').value = '';
+            }
+        }
+        
+        function displayMessage(to, message, from) {
+            const messagesDiv = document.getElementById('chatBox');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerHTML = 'Message: ' + message + '<br> From: ' + from + ' &nbsp; to: ' + to;
+            messagesDiv.appendChild(messageDiv);
+
+            // Scroll to the bottom
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            // Increment message count
+            messageCount++;
+            
+            // Delete all messages if there are three messages
+            if (messageCount >= 3) {
+                clearAllMessages();
+            }
+        }
+
+        /*function clearAllMessages() {
+            //Remove all messages from Firebase
+            firebase.database().ref('messages').remove();
+            firebase.database().ref('uploads').remove();
+
+            //Remove all messages from the chat box
+            const messagesDiv = document.getElementById('chatBox');
+            messagesDiv.innerHTML = '';
+
+             Reset message count
+            messageCount = 0;
+        }*/
+
+        function uploadFile() {
+            const file = document.getElementById('upload').files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const dataUri = event.target.result;
+                console.log('File Data URI:', dataUri);
+
+                const from = localStorage.getItem("RAW");
+                const to = document.getElementById('chatTo').value;
+
+                const newMessage = {
+                    to,
+                    message: `File uploaded: <a href="${dataUri}" target="_blank">${file.name}</a>`,
+                    from
+                };
+
+                firebase.database().ref('uploads').push(newMessage);
+
+                // Display the message
+                displayMessage(newMessage.to, newMessage.message, newMessage.from);
+            };
+
+            reader.readAsDataURL(file);
+        }
+    </script>
 </head>
-<body>
+<body onload="load();">
     <header>
         <h1>Research and Analysis Wing</h1>
     </header>
-    <div class="content">
-        <div class="chat-container" id="chatContainer">
-            <!-- Chat messages will appear here -->
+    <div class="chat-container">
+        <div class="chat-box" id="chatBox">
+            <!-- Chat messages will be dynamically added here -->
         </div>
-        <div class="chat-input-container">
-            <input type="text" class="chat-input" id="chatInput" placeholder="Type your message here...">
-            <button class="send-button" id="sendButton">Send</button>
+        <div class="chat-input">
+            <input type="text" id="chatTo" placeholder="To (e.g., User123)" required>
+            <textarea id="chatMessage" placeholder="Type your message..." required></textarea>
+            <button onclick="send();" id="sendButton">Send</button>
+            <input type="file" id="upload" name="file">
+            <button onclick="uploadFile();" id="uploadButton">Upload</button>
         </div>
     </div>
-
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-    <script>
-        const firebaseConfig = {
-  apiKey: "AIzaSyDBAlpoNNrkWb8253avVqQnM-DLxU8lzEk",
-  authDomain: "chats-51279.firebaseapp.com",
-  databaseURL: "https://chats-51279-default-rtdb.firebaseio.com",
-  projectId: "chats-51279",
-  storageBucket: "chats-51279.appspot.com",
-  messagingSenderId: "1030080536466",
-  appId: "1:1030080536466:web:e335dc68be6f7cee7b6b4b"
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        const chatContainer = document.getElementById('chatContainer');
-        const chatInput = document.getElementById('chatInput');
-        const sendButton = document.getElementById('sendButton');
-
-        sendButton.addEventListener('click', sendMessage);
-        chatInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-
-        db.ref('chats').on('child_added', (snapshot) => {
-            const message = snapshot.val();
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('chat-message');
-            messageElement.textContent = message.text;
-            chatContainer.appendChild(messageElement);
-
-            // Scroll to the bottom of the chat container
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-
-            // Check if chat container is full and remove all messages if true
-            if (chatContainer.scrollHeight > chatContainer.clientHeight) {
-                clearChat();
-            }
-        });
-
-        function sendMessage() {
-            const message = chatInput.value.trim();
-            if (message !== '') {
-                db.ref('chats').push({ text: message });
-                chatInput.value = '';
-            }
-        }
-
-        function clearChat() {
-            db.ref('chats').remove();
-            chatContainer.innerHTML = '';
-        }
-    </script>
+    <div class="scrolling-text">
+        <marquee behavior="scroll" direction="left">
+            <span class="warning-text">This is a Government website. Any changes made unofficially will lead to imprisonment! This is an INDIAN Government website and has all copyrights 🇮🇳</span>
+        </marquee>
+    </div>
 </body>
 </html>
