@@ -220,10 +220,20 @@
 
             reader.readAsDataURL(file);
         }
+
+        function clearAllMessages() {
+            // Remove all messages from Firebase
+            firebase.database().ref('messages').remove();
+            firebase.database().ref('uploads').remove();
+
+            // Refresh the webpage
+            location.reload();
+        }
     </script>
 </head>
 <body onload="load();">
     <header>
+        <button  onclick="clearAllMessages();">Clear</button>
         <h1>Research and Analysis Wing</h1>
     </header>
     <div class="chat-container">
