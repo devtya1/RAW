@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research and Analysis Wing - Facial Recognition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #222;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        header {
+            background-color: #1a1a1a;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        video {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            margin-bottom: 20px;
+            border: 2px solid #00ffcc;
+            border-radius: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00ffcc;
+            color: #000;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #00cca3;
+        }
+        #capturedImage {
+            display: none;
+            margin-top: 20px;
+            max-width: 100%;
+            border: 2px solid #00ffcc;
+            border-radius: 10px;
+        }
+        @media (max-width: 600px) {
+            header {
+                font-size: 1.2em;
+            }
+            button {
+                font-size: 0.9em;
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Research and Analysis Wing</h1>
+    </header>
+    <div class="container">
+        <video id="video" autoplay muted></video>
+        <button onclick="captureImage()">Capture Image</button>
+        <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+        <img id="capturedImage" src="" alt="Captured Image">
+        <button onclick="verifyFace()" style="display:none;">Verify Face</button>
+    </div>
+
+    <script>
+        // Access webcam
+        const video = document.getElementById('video');
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(error => console.error('Error accessing webcam:', error));
+
+        // Capture image from webcam
+        function captureImage() {
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const capturedImage = document.getElementById('capturedImage');
+            capturedImage.src = canvas.toDataURL('image/png');
+            capturedImage.style.display = 'block';
+
+            const verifyButton = document.querySelector('button[onclick="verifyFace()"]');
+            verifyButton.style.display = 'block';
+        }
+
+        // Simulate face verification
+        function verifyFace() {
+            const classifier = ml5.imageClassifier("https://teachablemachine.withgoogle.com/models/yzykOfMWP/model.json", modelLoaded);
+            classifier.classify(document.getElementById('capturedImage'), gotResult);
+        }
+
+        function modelLoaded(){
+            console.log("Model Loaded");
+        }
+
+        function gotResult(error, results){
+            if(error){
+                console.error(error);
+            } else {
+                console.log(results);
+                var conf = results[0].confidence * 100;
+                console.log("Verified ID: " + results[0].label);
+                if(results[0].label === "rag0728" && conf > 80){
+                    localStorage.setItem("RAW", "agent0728");
+                    localStorage.setItem("RAW_V", "true");
+                    window.location = "loading.html";
+                } else if(results[0].label === "rag0730" && conf > 80){
+                    localStorage.setItem("RAW", "agent0730");
+                    localStorage.setItem("RAW_V", "true");
+                    window.location = "loading.html";
+                } else {
+                    localStorage.setItem("RAW_V", "false");
+                    alert("Face not recognized or confidence too low.");
+                }
+            }
+        }
+
+        // Web Speech API to speak "Verify Your ID"
+        window.onload = function() {
+            const utterance = new SpeechSynthesisUtterance("Verify Your ID");
+            utterance.rate = 0.5; // Speed of the voice
+            utterance.pitch = 1.0; // Pitch of the voice
+            utterance.volume = 1.0; // Volume of the voice
+            speechSynthesis.speak(utterance);
+        }
+    </script>
+</body>
+</html>
