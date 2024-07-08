@@ -181,46 +181,6 @@
             }
         }
 
-        /*function clearAllMessages() {
-            //Remove all messages from Firebase
-            firebase.database().ref('messages').remove();
-            firebase.database().ref('uploads').remove();
-
-            //Remove all messages from the chat box
-            const messagesDiv = document.getElementById('chatBox');
-            messagesDiv.innerHTML = '';
-
-             Reset message count
-            messageCount = 0;
-        }*/
-
-        function uploadFile() {
-            const file = document.getElementById('upload').files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const dataUri = event.target.result;
-                console.log('File Data URI:', dataUri);
-
-                const from = localStorage.getItem("RAW");
-                const to = document.getElementById('chatTo').value;
-
-                const newMessage = {
-                    to,
-                    message: `File uploaded: <a href="${dataUri}" target="_blank">${file.name}</a>`,
-                    from
-                };
-
-                firebase.database().ref('uploads').push(newMessage);
-
-                // Display the message
-                displayMessage(newMessage.to, newMessage.message, newMessage.from);
-            };
-
-            reader.readAsDataURL(file);
-        }
-
         function clearAllMessages() {
             // Remove all messages from Firebase
             firebase.database().ref('messages').remove();
@@ -229,11 +189,41 @@
             // Refresh the webpage
             location.reload();
         }
+
+        function uploadFiles() {
+            const files = document.getElementById('upload').files;
+            if (!files.length) return;
+
+            const from = localStorage.getItem("RAW");
+            const to = document.getElementById('chatTo').value;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const dataUri = event.target.result;
+                    console.log('File Data URI:', dataUri);
+
+                    const newMessage = {
+                        to,
+                        message: `File uploaded: <a href="${dataUri}" target="_blank">${file.name}</a>`,
+                        from
+                    };
+
+                    firebase.database().ref('uploads').push(newMessage);
+
+                    // Display the message
+                    displayMessage(newMessage.to, newMessage.message, newMessage.from);
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
     </script>
 </head>
 <body onload="load();">
     <header>
-        <button  onclick="clearAllMessages();">Clear</button>
+        <button onclick="clearAllMessages();">Clear</button>
         <h1>Research and Analysis Wing</h1>
     </header>
     <div class="chat-container">
@@ -244,8 +234,8 @@
             <input type="text" id="chatTo" placeholder="To (e.g., User123)" required>
             <textarea id="chatMessage" placeholder="Type your message..." required></textarea>
             <button onclick="send();" id="sendButton">Send</button>
-            <input type="file" id="upload" name="file">
-            <button onclick="uploadFile();" id="uploadButton">Upload</button>
+            <input type="file" id="upload" name="file" multiple>
+            <button onclick="uploadFiles();" id="uploadButton">Upload</button>
         </div>
     </div>
     <div class="scrolling-text">
