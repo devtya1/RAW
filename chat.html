@@ -31,13 +31,13 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 10px;
+            padding: 20px;
             box-sizing: border-box;
         }
         .chat-box {
             flex: 1;
             overflow-y: auto;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             background-color: #333;
             padding: 10px;
             border-radius: 5px;
@@ -46,8 +46,9 @@
             margin-bottom: 10px;
             padding: 10px;
             border-radius: 16px;
-            background-color: #fff;
-            color: #000;
+            width: 100%;
+            color: black;
+            background-color: white;
             font-weight: bold;
             word-wrap: break-word;
         }
@@ -55,6 +56,9 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+        }
+        h1{
+            color: #00ffcc;
         }
         input, textarea {
             padding: 10px;
@@ -72,8 +76,8 @@
             padding: 10px;
             border: none;
             border-radius: 5px;
-            background-color: #00ffcc;
-            color: #000;
+            background-color: #1a1a1a;
+            color: #fff;
             cursor: pointer;
             font-size: 1em;
         }
@@ -82,8 +86,8 @@
             cursor: not-allowed;
         }
         .scrolling-text {
-            background-color: #00ffcc;
-            color: #000;
+            background-color: red;
+            color: black;
             font-weight: bold;
             padding: 10px 0;
             text-align: center;
@@ -96,12 +100,12 @@
                 flex-direction: row;
                 align-items: center;
             }
-            input, textarea {
+            input {
                 flex: 1;
                 margin-right: 10px;
             }
-            button {
-                flex: 0 0 auto;
+            textarea {
+                flex: 3;
                 margin-right: 10px;
             }
         }
@@ -109,20 +113,20 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script>
-        // Firebase configuration
+        // Your web app's Firebase configuration
         var firebaseConfig = {
-            apiKey: "your-api-key",
-            authDomain: "your-auth-domain",
-            databaseURL: "https://your-database-url.firebaseio.com",
-            projectId: "your-project-id",
-            storageBucket: "your-storage-bucket",
-            messagingSenderId: "your-messaging-sender-id",
-            appId: "your-app-id"
+            apiKey: "AIzaSyDN7r1ikI-ylmx4rtYMf6g-G2uYtsFxIUg",
+            authDomain: "chat-raw.firebaseapp.com",
+            databaseURL: "https://chat-raw-default-rtdb.firebaseio.com",
+            projectId: "chat-raw",
+            storageBucket: "chat-raw.appspot.com",
+            messagingSenderId: "762895654305",
+            appId: "1:762895654305:web:76a3989d55f196806fbfe0"
         };
-
+        
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-
+        
         var messageCount = 0;
 
         function load() {
@@ -137,27 +141,27 @@
                 displayMessage(uploads.to, uploads.message, uploads.from);
             });
         }
-
+        
         function send() {
             const to = document.getElementById('chatTo').value;
             const from = localStorage.getItem("RAW");
             const message = document.getElementById('chatMessage').value;
-
+            
             if (to && message && from) {
                 const newMessage = {
                     to,
                     message,
                     from
                 };
-
+                
                 firebase.database().ref('messages').push(newMessage);
-
+                
                 // Clear input fields
                 document.getElementById('chatTo').value = '';
                 document.getElementById('chatMessage').value = '';
             }
         }
-
+        
         function displayMessage(to, message, from) {
             const messagesDiv = document.getElementById('chatBox');
             const messageDiv = document.createElement('div');
@@ -170,16 +174,25 @@
 
             // Increment message count
             messageCount++;
+            
+            // Delete all messages if there are three messages
+            if (messageCount >= 3) {
+                clearAllMessages();
+            }
         }
 
-        function clearAllMessages() {
-            // Remove all messages from Firebase
+        /*function clearAllMessages() {
+            //Remove all messages from Firebase
             firebase.database().ref('messages').remove();
             firebase.database().ref('uploads').remove();
 
-            // Refresh the webpage
-            location.reload();
-        }
+            //Remove all messages from the chat box
+            const messagesDiv = document.getElementById('chatBox');
+            messagesDiv.innerHTML = '';
+
+             Reset message count
+            messageCount = 0;
+        }*/
 
         function uploadFile() {
             const file = document.getElementById('upload').files[0];
@@ -223,7 +236,6 @@
             <button onclick="send();" id="sendButton">Send</button>
             <input type="file" id="upload" name="file">
             <button onclick="uploadFile();" id="uploadButton">Upload</button>
-            <button onclick="clearAllMessages();" id="clearButton">Clear</button>
         </div>
     </div>
     <div class="scrolling-text">
