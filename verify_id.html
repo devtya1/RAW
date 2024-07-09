@@ -69,7 +69,6 @@
         }
         #capturedImage {
             width: 100%;
-            height: 200px;
             border-radius: 10px;
         }
         #matchingAnimation {
@@ -135,7 +134,7 @@
     </header>
     <div class="container">
         <video id="video" autoplay muted></video>
-        <button onclick="captureImage()">Capture Image</button>
+        <button id="capture" onclick="captureImage()">Capture Image</button>
         <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
         <div class="image-container" id="imageContainer">
             <img id="capturedImage" src="" alt="Captured Image">
@@ -172,6 +171,8 @@
 
             const verifyButton = document.getElementById('verifyButton');
             verifyButton.style.display = 'block';
+            document.getElementById("video").style.display = "none";
+            document.getElementById("capture").style.display = "none";
         }
 
         // Simulate face verification
@@ -226,6 +227,9 @@
 
         // Web Speech API to speak "Verify Your ID"
         window.onload = function() {
+            document.getElementById("video").style.display = "none";
+            document.getElementById("capture").style.display = "none";
+
             const utterance = new SpeechSynthesisUtterance("Verify Your ID");
             utterance.rate = 1.0; // Speed of the voice
             utterance.pitch = 1.0; // Pitch of the voice
