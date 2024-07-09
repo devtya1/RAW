@@ -227,8 +227,8 @@
 
         // Web Speech API to speak "Verify Your ID"
         window.onload = function() {
-            document.getElementById("video").style.display = "none";
-            document.getElementById("capture").style.display = "none";
+            document.getElementById("video").style.display = "block";
+            document.getElementById("capture").style.display = "block";
 
             const utterance = new SpeechSynthesisUtterance("Verify Your ID");
             utterance.rate = 1.0; // Speed of the voice
