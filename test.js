@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (user.password === password) { // Note: This is not secure in a real application
                     // Redirect to the dashboard or another page
                     localStorage.setItem("RAW", username);
-                    window.location.href = 'verify.html';
+                    window.location.href = 'verify_id.html';
                 } else {
                     errorMessage.textContent = 'Invalid username or password.';
                 }
