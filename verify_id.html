@@ -128,13 +128,14 @@
         }
     </style>
 </head>
-<body>
+<body onload="open_cam()">
     <header>
         <h1>Research and Analysis Wing</h1>
     </header>
     <div class="container">
         <video id="video" autoplay muted></video>
         <button id="capture" onclick="captureImage()">Capture Image</button>
+        <button id="open" onclick="open_cam()">Open Camera</button>
         <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
         <div class="image-container" id="imageContainer">
             <img id="capturedImage" src="" alt="Captured Image">
@@ -151,12 +152,14 @@
 
     <script>
         // Access webcam
+        function open_cam(){
         const video = document.getElementById('video');
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(stream => {
                 video.srcObject = stream;
             })
             .catch(error => console.error('Error accessing webcam:', error));
+        }
 
         // Capture image from webcam
         function captureImage() {
@@ -173,6 +176,7 @@
             verifyButton.style.display = 'block';
             document.getElementById("video").style.display = "none";
             document.getElementById("capture").style.display = "none";
+            document.getElementById("open").style.display = "none";
         }
 
         // Simulate face verification
@@ -229,6 +233,7 @@
         window.onload = function() {
             document.getElementById("video").style.display = "block";
             document.getElementById("capture").style.display = "block";
+            document.getElementById("open").style.display = "block";
 
             const utterance = new SpeechSynthesisUtterance("Verify Your ID");
             utterance.rate = 1.0; // Speed of the voice
