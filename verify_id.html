@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research and Analysis Wing - Facial Recognition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #222;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        header {
+            background-color: #1a1a1a;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        video {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            margin-bottom: 20px;
+            border: 2px solid #00ffcc;
+            border-radius: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00ffcc;
+            color: #000;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #00cca3;
+        }
+        .image-container {
+            position: relative;
+            max-width: 100%;
+            display: none;
+            margin-top: 20px;
+            border: 2px solid #00ffcc;
+            border-radius: 10px;
+        }
+        #capturedImage {
+            width: 100%;
+            border-radius: 10px;
+        }
+        #matchingAnimation {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            color: #00ffcc;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .matching-text {
+            margin-top: 10px;
+        }
+        .scanner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg, transparent, #00ffcc, transparent);
+            display: none;
+        }
+        @keyframes scan {
+            0% {
+                left: 0;
+            }
+            50% {
+                left: 100%;
+            }
+            100% {
+                left: 0;
+            }
+        }
+        @media (max-width: 600px) {
+            header {
+                font-size: 1.2em;
+            }
+            button {
+                font-size: 0.9em;
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Research and Analysis Wing</h1>
+    </header>
+    <div class="container">
+        <video id="video" autoplay muted></video>
+        <button onclick="captureImage()">Capture Image</button>
+        <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+        <div class="image-container" id="imageContainer">
+            <img id="capturedImage" src="" alt="Captured Image">
+            <div class="scanner" id="scanner"></div>
+        </div>
+        <button id="verifyButton" onclick="verifyFace()" style="display:none;">Verify Face</button>
+        <div id="matchingAnimation">
+            <div class="matching-text">Matching...</div>
+            <div class="dots">
+                <span>.</span><span>.</span><span>.</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Access webcam
+        const video = document.getElementById('video');
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(error => console.error('Error accessing webcam:', error));
+
+        // Capture image from webcam
+        function captureImage() {
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const capturedImage = document.getElementById('capturedImage');
+            capturedImage.src = canvas.toDataURL('image/png');
+            const imageContainer = document.getElementById('imageContainer');
+            imageContainer.style.display = 'block';
+
+            const verifyButton = document.getElementById('verifyButton');
+            verifyButton.style.display = 'block';
+        }
+
+        // Simulate face verification
+        function verifyFace() {
+            const scanner = document.getElementById('scanner');
+            scanner.style.display = 'block';
+            scanner.style.animation = 'scan 2s linear infinite';
+
+            const capturedImage = document.getElementById('capturedImage');
+            const matchingAnimation = document.getElementById('matchingAnimation');
+            matchingAnimation.style.display = 'block';
+
+            const classifier = ml5.imageClassifier("https://teachablemachine.withgoogle.com/models/yzykOfMWP/model.json", () => {
+                classifier.classify(capturedImage, (error, results) => {
+                    matchingAnimation.style.display = 'none';
+                    scanner.style.display = 'none';
+                    if (error) {
+                        console.error(error);
+                    } else {
+                        console.log(results);
+                        var conf = results[0].confidence * 100;
+                        console.log("Verified ID: " + results[0].label);
+
+                        if(localStorage.getItem("RAW") == "rag0728"){
+                        if (results[0].label === "rag0728" && conf > 80) {
+                            localStorage.setItem("RAW", "agent0728");
+                            window.location = "loading.html";
+                        }
+                        else{
+                            alert("User not Verified!");
+                            window.location = "verify_id.html";
+                        }
+                    }
+
+                        else if(localStorage.getItem("RAW") == "rag0730"){
+                        if (results[0].label === "rag0730" && conf > 80) {
+                            localStorage.setItem("RAW", "agent0730");
+                            window.location = "loading.html";
+                        }
+                        else{
+                            alert("User not Verified!");
+                            window.location = "verify_id.html";
+                        }
+                        } 
+                        
+                        else {
+                            alert("Face not recognized or confidence too low.");
+                            window.location = "verify_id.html";
+                        }
+                    }
+                });
+            });
+        }
+
+        // Web Speech API to speak "Verify Your ID"
+        window.onload = function() {
+            const utterance = new SpeechSynthesisUtterance("Verify Your ID");
+            utterance.rate = 1.0; // Speed of the voice
+            utterance.pitch = 1.0; // Pitch of the voice
+            utterance.volume = 1.0; // Volume of the voice
+            speechSynthesis.speak(utterance);
+        }
+        
+    </script>
+</body>
+</html>
