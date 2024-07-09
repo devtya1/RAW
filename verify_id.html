@@ -189,7 +189,7 @@
             const matchingAnimation = document.getElementById('matchingAnimation');
             matchingAnimation.style.display = 'block';
 
-            const classifier = ml5.imageClassifier("https://teachablemachine.withgoogle.com/models/yzykOfMWP/model.json", () => {
+            const classifier = ml5.imageClassifier("https://teachablemachine.withgoogle.com/models/xdOnkDXvf/model.json", () => {
                 classifier.classify(capturedImage, (error, results) => {
                     matchingAnimation.style.display = 'none';
                     scanner.style.display = 'none';
