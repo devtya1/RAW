@@ -115,6 +115,16 @@
                 font-size: 0.9em;
                 padding: 8px 16px;
             }
+            .image-container {
+                max-width: 100%;
+            }
+            .container {
+                padding: 10px; /* Adjust padding for smaller screens */
+            }
+            #verifyButton {
+                position: relative; /* Ensure button is positioned correctly */
+                z-index: 1; /* Ensure button appears above other elements */
+            }
         }
     </style>
 </head>
@@ -185,27 +195,25 @@
                         console.log("Verified ID: " + results[0].label);
 
                         if(localStorage.getItem("RAW") == "rag0728"){
-                        if (results[0].label === "rag0728" && conf > 80) {
-                            localStorage.setItem("RAW", "agent0728");
-                            window.location = "loading.html";
+                            if (results[0].label === "rag0728" && conf > 80) {
+                                localStorage.setItem("RAW", "agent0728");
+                                window.location = "loading.html";
+                            }
+                            else{
+                                alert("User not Verified!");
+                                window.location = "verify_id.html";
+                            }
                         }
-                        else{
-                            alert("User not Verified!");
-                            window.location = "verify_id.html";
-                        }
-                    }
-
                         else if(localStorage.getItem("RAW") == "rag0730"){
-                        if (results[0].label === "rag0730" && conf > 80) {
-                            localStorage.setItem("RAW", "agent0730");
-                            window.location = "loading.html";
-                        }
-                        else{
-                            alert("User not Verified!");
-                            window.location = "verify_id.html";
-                        }
+                            if (results[0].label === "rag0730" && conf > 80) {
+                                localStorage.setItem("RAW", "agent0730");
+                                window.location = "loading.html";
+                            }
+                            else{
+                                alert("User not Verified!");
+                                window.location = "verify_id.html";
+                            }
                         } 
-                        
                         else {
                             alert("Face not recognized or confidence too low.");
                             window.location = "verify_id.html";
