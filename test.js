@@ -1,3 +1,14 @@
+const firebaseConfig = {
+  apiKey: "AIzaSyBGXYL4ukjzxk-gR5i9HMgHDIVW6N4clzI",
+  authDomain: "raw-pune.firebaseapp.com",
+  projectId: "raw-pune",
+  storageBucket: "raw-pune.appspot.com",
+  messagingSenderId: "150425623882",
+  appId: "1:150425623882:web:c8838ffa898a7a865df5b3"
+};
+
+firebase.initializeApp(firebaseConfig);
+
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const errorMessage = document.getElementById('error-message');
