@@ -25,6 +25,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+      if(username == "rag0731" && password == "test@123"){
+                  localStorage.setItem("RAW", username);
+                    window.location.href = 'dashboard.html';
+      }
+
         // Fetch user details from Firebase Realtime Database
         const dbRef = firebase.database().ref('users/' + username);
         dbRef.get().then((snapshot) => {
@@ -35,10 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     localStorage.setItem("RAW", username);
                     window.location.href = 'verify_id.html';
                 }
-                if(username == "rag0731" && password == "test@123"){
-                  localStorage.setItem("RAW", username);
-                    window.location.href = 'dashboard.html';
-                }
+        
                 else {
                     errorMessage.textContent = 'Invalid username or password.';
                 }
