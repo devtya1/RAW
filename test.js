@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if(username == "rag0731" && password == "test@123"){
                   localStorage.setItem("RAW", username);
-                    window.location.href = 'dashboard.html';
+                    window.location = 'dashboard.html';
       }
 
         // Fetch user details from Firebase Realtime Database
