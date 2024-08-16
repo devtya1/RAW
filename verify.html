@@ -65,6 +65,68 @@
             max-width: 100%;
             border: 2px solid #00ffcc;
             border-radius: 10px;
+            position: relative;
+        }
+        #scanner {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(0, 255, 204, 0.3), rgba(0, 255, 204, 0));
+            animation: scan 2s linear infinite;
+            border-radius: 10px;
+        }
+        @keyframes scan {
+            0% {
+                top: -100%;
+            }
+            100% {
+                top: 100%;
+            }
+        }
+        #loadingOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #00ffcc;
+            font-family: 'Orbitron', sans-serif;
+        }
+        #loadingOverlay .loading-text {
+            margin-bottom: 20px;
+        }
+        #loadingOverlay .dots {
+            font-size: 2em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #loadingOverlay .dots span {
+            margin: 0 5px;
+            animation: blink 1s infinite;
+        }
+        #loadingOverlay .dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        #loadingOverlay .dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes blink {
+            0%, 100% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
         }
         @media (max-width: 600px) {
             header {
@@ -85,10 +147,18 @@
         <video id="video" autoplay muted></video>
         <button onclick="captureImage()">Capture Image</button>
         <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
-        <img id="capturedImage" src="" alt="Captured Image">
+        <div id="capturedImageContainer">
+            <img id="capturedImage" src="" alt="Captured Image">
+            <div id="scanner"></div>
+        </div>
         <button onclick="verifyFace()" style="display:none;">Verify Face</button>
     </div>
-
+    <div id="loadingOverlay">
+        <div class="loading-text">Verifying Face</div>
+        <div class="dots">
+            <span>.</span><span>.</span><span>.</span>
+        </div>
+    </div>
     <script>
         // Access webcam
         const video = document.getElementById('video');
@@ -114,6 +184,15 @@
 
         // Simulate face verification
         function verifyFace() {
+            const scanner = document.getElementById('scanner');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            // Start scanner animation
+            scanner.style.display = 'block';
+
+            // Show loading overlay
+            loadingOverlay.style.display = 'flex';
+
             const classifier = ml5.imageClassifier("https://teachablemachine.withgoogle.com/models/yzykOfMWP/model.json", modelLoaded);
             classifier.classify(document.getElementById('capturedImage'), gotResult);
         }
@@ -123,6 +202,13 @@
         }
 
         function gotResult(error, results){
+            const scanner = document.getElementById('scanner');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            // Stop scanner animation and hide loading overlay
+            scanner.style.display = 'none';
+            loadingOverlay.style.display = 'none';
+
             if(error){
                 console.error(error);
             } else {
