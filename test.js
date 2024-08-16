@@ -1,12 +1,14 @@
 const firebaseConfig = {
   apiKey: "AIzaSyBGXYL4ukjzxk-gR5i9HMgHDIVW6N4clzI",
   authDomain: "raw-pune.firebaseapp.com",
+  databaseURL: "https://raw-pune-default-rtdb.firebaseio.com",
   projectId: "raw-pune",
   storageBucket: "raw-pune.appspot.com",
   messagingSenderId: "150425623882",
   appId: "1:150425623882:web:c8838ffa898a7a865df5b3"
 };
 
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -25,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-      if(username == "rag0731" && password == "test@123"){
+      if(username == "rag0730" && password == "test@123"){
                   localStorage.setItem("RAW", username);
                     window.location = 'dashboard.html';
       }
