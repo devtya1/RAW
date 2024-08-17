@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily News Hub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #003366;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            background-color: #004080;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #003366;
+        }
+
+        .search-box {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .search-box input[type="text"] {
+            width: 80%;
+            max-width: 400px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .search-box button {
+            padding: 10px 20px;
+            background-color: #004080;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .content {
+            padding: 20px;
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        aside {
+            margin-top: 20px;
+        }
+
+        aside h3 {
+            margin-bottom: 10px;
+        }
+
+        aside a {
+            display: block;
+            margin-bottom: 10px;
+            color: #003366;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        aside a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #003366;
+            color: white;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Daily News Hub</h1>
+    </header>
+
+    <nav>
+        <a href="#">Home</a>
+        <a href="#">World</a>
+        <a href="#">Politics</a>
+        <a href="#">Technology</a>
+        <a href="#">Sports</a>
+        <a href="#">Entertainment</a>
+    </nav>
+
+    <div class="search-box">
+        <input type="text" id="search" placeholder="Search...">
+        <button onclick="check();">Search</button>
+    </div>
+
+    <div class="content">
+        <h1>Local Community Garden Thrives Despite Urban Growth</h1>
+        <img src="news.jpeg" alt="Community Garden">
+        <p>A small but thriving community garden is flourishing amidst the rapid urban development in the city. Located in the heart of downtown, this green oasis provides a peaceful retreat for residents and a space to grow fresh produce.</p>
+        <p>The garden, run entirely by volunteers, offers a variety of fruits, vegetables, and herbs. It has become a popular spot for locals to gather, share gardening tips, and enjoy nature.</p>
+        <p>“It's amazing how much this garden has brought the community together,” says longtime volunteer Sarah Lee. “In a city that’s always growing, it’s nice to have a place that stays green.”</p>
+        <p>As the city continues to expand, the future of the garden remains uncertain. However, the community is determined to protect this green space and ensure it remains a part of the neighborhood for years to come.</p>
+    </div>
+
+    <aside class="related-articles">
+        <h3>Related Articles</h3>
+        <a href="#">Urban Farms: The Next Big Thing?</a>
+        <a href="#">10 Tips for Starting Your Own Garden</a>
+        <a href="#">The Impact of Green Spaces on Mental Health</a>
+        <a href="#">How to Get Involved in Local Gardening Projects</a>
+    </aside>
+
+    <footer>
+        <p>&copy; 2024 Daily News Hub. All rights reserved.</p>
+    </footer>
+    <script>
+        function check(){
+        var search = document.getElementById("search").value;
+
+        if(search == "quit rag0730" || search == "quit rag0728"){
+            window.location = "dashboard.html";
+        }
+        else{
+            window.location = "undercover.html";
+        }
+    }
+    </script>
+</body>
+</html>
