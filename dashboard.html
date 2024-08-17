@@ -14,6 +14,7 @@
     </header>
     <div class="dashboard-container">
         <div class="dashboard-box">
+            <button id="button_undercover" class="btn">Undercover</button>
             <button onclick="window.location = 'chat.html'" id="button1" class="btn">Chats</button>
             <button onclick="window.location = 'gallery.html'" id="button2" class="btn">Gallery</button>
             <button onclick="fnc();" id="button2" class="btn">My ID-Card</button>
@@ -26,19 +27,15 @@
     </div>
     <div class="scrolling-text">
         <marquee behavior="scroll" direction="left">
-            <span class="warning-text">This is a Government website. Any changes made unofficially will lead to imprisonment! and This is a INDIAN Government website and has all copyrights 🇮🇳</span>
+            <span class="warning-text">This is a Government website. Any changes made unofficially will lead to imprisonment! This is an INDIAN Government website and has all copyrights 🇮🇳</span>
         </marquee>
     </div>
 
     <script>
-        function fnc(){
-            if(localStorage.getValue("RAW") == "rag0730"){
-                window.location = "id_training.html";
-            }
-            else{
-                window.location = "id.html";
-            }
-        }
+        // Function to handle the undercover button click
+        document.getElementById('button_undercover').onclick = function() {
+            window.location.href = 'undercover.html';
+        };
     </script>
 </body>
 </html>
