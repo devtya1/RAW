@@ -149,6 +149,7 @@
     <div class="container">
         <video id="video" autoplay muted></video>
         <button onclick="captureImage()">Capture Image</button>
+        <button onclick="window.location = 'undercover.html'">Undercover</button>
         <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
         <div id="capturedImageContainer">
             <img id="capturedImage" src="" alt="Captured Image">
@@ -235,6 +236,7 @@
 
         // Web Speech API to speak "Verify Your ID"
         window.onload = function() {
+            localStorage.setItem("page_raw", "verify.html");
             const utterance = new SpeechSynthesisUtterance("Verify Your ID");
             utterance.rate = 0.5; // Speed of the voice
             utterance.pitch = 1.0; // Pitch of the voice
