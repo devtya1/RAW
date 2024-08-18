@@ -50,8 +50,13 @@
             border: 0;
         }
 
-        .back-button {
+        .button-container {
+            display: flex;
+            gap: 10px;
             margin: 20px;
+        }
+
+        .back-button, .undercover-button {
             padding: 10px 20px;
             font-size: 1em;
             border: none;
@@ -63,7 +68,7 @@
             transition: background-color 0.3s;
         }
 
-        .back-button:hover {
+        .back-button:hover, .undercover-button:hover {
             background-color: #0a0;
         }
 
@@ -87,18 +92,29 @@
         }
     </style>
 </head>
-<body>
+<body onload="load();">
     <header>
         <h1>Research and Analysis Wing</h1>
     </header>
     <div class="map-container">
         <iframe class="map-placeholder" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4292.6908943974895!2d77.20432969251108!3d28.618490830714887!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce3fef90ec539%3A0x71d3df281b7b83da!2sNew%20Parliament%20Building!5e0!3m2!1sen!2sin!4v1718595100252!5m2!1sen!2sin" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
     </div>
-    <button class="back-button" onclick="window.location.href='dashboard.html'">Back</button>
+    
+    <div class="button-container">
+        <button class="back-button" onclick="window.location.href='dashboard.html'">Back</button>
+        <button class="undercover-button" onclick="window.location.href='undercover.html'">Undercover</button>
+    </div>
+    
     <div class="scrolling-text">
         <marquee behavior="scroll" direction="left">
             <span class="warning-text">This is a Government website. Any changes made unofficially will lead to imprisonment! and This is an INDIAN Government website and has all copyrights 🇮🇳</span>
         </marquee>
     </div>
+
+    <script>
+        function load(){
+            localStorage.setItem("page_raw", "map.html");
+        }
+    </script>
 </body>
 </html>
