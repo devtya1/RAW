@@ -61,3 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 });
+
+function load(){
+            localStorage.setItem("page_raw", "test.html");
+        }
