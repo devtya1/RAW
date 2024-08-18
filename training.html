@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
 </head>
-<body>
+<body onload="load();">
     <header>
         <h1>Research and Analysis Wing</h1>
     </header>
@@ -30,6 +30,9 @@
     </div>
 
     <script>
+        function load(){
+            localStorage.setItem("page_raw", "training.html");
+        }
     </script>
 </body>
 </html>
