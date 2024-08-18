@@ -54,7 +54,7 @@
         }
     </style>
 </head>
-<body>
+<body onload="load();">
     <div class="id-card">
         <div class="id-photo"><img style="border-radius: 60px; margin-left: 10px; margin-top: 10px; width: 110px; height: 100px;" src="saanaya.jpeg"></div>
         <div class="id-details">
@@ -70,5 +70,10 @@
             <p>Government of India</p>
         </div>
     </div>
+    <script>
+        function load(){
+            localStorage.setItem("page_raw", "Test_id.html");
+        }
+    </script>
 </body>
 </html>
