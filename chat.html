@@ -130,7 +130,7 @@
         var messageCount = 0;
 
         function load() {
-            localStorage.setItem("page_raw", "Test_id.html");
+            localStorage.setItem("page_raw", "chat.html");
             const messagesRef = firebase.database().ref('messages');
             messagesRef.on('child_added', (snapshot) => {
                 const message = snapshot.val();
