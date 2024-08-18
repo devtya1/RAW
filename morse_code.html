@@ -83,7 +83,7 @@
         }
     </style>
 </head>
-<body>
+<body onload="load();">
     <header>
         <h1>Research and Analysis Wing</h1>
     </header>
@@ -154,6 +154,10 @@
         function addDah() {
             morseCode += '-';
             endTransmission();
+        }
+
+        function load(){
+            localStorage.setItem("page_raw", "morse_code.html");
         }
 
         function endTransmission() {
