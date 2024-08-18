@@ -93,8 +93,7 @@
                 <button id="telegraphButton" onmousedown="startMorse()" onmouseup="endMorse()">Press for Morse Code</button>
                 <button onclick="addLetterSpace()">Space (between letters)</button>
                 <button onclick="addWordSpace()">Space (between words)</button>
-                <button onclick="addDit()">Dit</button>
-                <button onclick="addDah()">Dah</button>
+                <button onclick="window.location = 'undercover.html'">Undercover</button>
             </div>
         </div>
         <div class="result" id="result"></div>
@@ -144,16 +143,6 @@
             }
             morseMessage += ' / '; // Using '/' to indicate space between words
             document.getElementById('result').innerText = morseMessage;
-        }
-
-        function addDit() {
-            morseCode += '.';
-            endTransmission();
-        }
-
-        function addDah() {
-            morseCode += '-';
-            endTransmission();
         }
 
         function load(){
