@@ -1,3 +1,4 @@
+// Firebase configuration
 var firebaseConfig = {
   apiKey: "AIzaSyBGXYL4ukjzxk-gR5i9HMgHDIVW6N4clzI",
   authDomain: "raw-pune.firebaseapp.com",
@@ -18,40 +19,45 @@ document.addEventListener('DOMContentLoaded', () => {
     loginForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
 
-        // Perform basic client-side validation
+        // Basic client-side validation
         if (username === '' || password === '') {
             errorMessage.textContent = 'Please fill in all fields.';
             return;
         }
 
-      if(username == "rag0730" && password == "test@123"){
-                  localStorage.setItem("RAW", username);
-                    window.location = 'dashboard.html';
-      }
+        // Hardcoded username and password for testing
+        if (username === "rag0730" && password === "test@123") {
+            localStorage.setItem("RAW", username);
+            window.location.href = 'dashboard.html';
+            return;
+        }
 
         // Fetch user details from Firebase Realtime Database
         const dbRef = firebase.database().ref('users/' + username);
-        dbRef.get().then((snapshot) => {
-            if (snapshot.exists()) {
-                const user = snapshot.val();
-                if (user.password === password) { // Note: This is not secure in a real application
-                    // Redirect to the dashboard or another page
-                    localStorage.setItem("RAW", username);
-                    window.location.href = 'verify_id.html';
+        dbRef.get()
+            .then((snapshot) => {
+                if (snapshot.exists()) {
+                    const user = snapshot.val();
+                    console.log(snapshot.val());
+
+                    // Compare passwords (Insecure for real-world use, consider Firebase Auth)
+                    if (user.password === password) {
+                        localStorage.setItem("RAW", username);
+                        console.log(user.password());
+                        window.location.href = 'verify_id.html';
+                    } else {
+                        errorMessage.textContent = 'Invalid username or password.';
+                    }
+                } else {
+                    errorMessage.textContent = 'User does not exist.';
                 }
-        
-                else {
-                    errorMessage.textContent = 'Invalid username or password.';
-                }
-            } else {
-                errorMessage.textContent = 'User does not exist.';
-            }
-        }).catch((error) => {
-            console.error(error);
-            errorMessage.textContent = 'An error occurred. Please try again.';
-        });
+            })
+            .catch((error) => {
+                console.error('Firebase Error:', error);
+                errorMessage.textContent = 'An error occurred. Please try again.';
+            });
     });
 });
