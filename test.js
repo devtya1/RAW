@@ -1,4 +1,4 @@
-const firebaseConfig = {
+var firebaseConfig = {
   apiKey: "AIzaSyBGXYL4ukjzxk-gR5i9HMgHDIVW6N4clzI",
   authDomain: "raw-pune.firebaseapp.com",
   databaseURL: "https://raw-pune-default-rtdb.firebaseio.com",
