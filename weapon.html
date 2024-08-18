@@ -100,7 +100,7 @@
         }
     </style>
 </head>
-<body>
+<body onload="load();">
     <header>
         <h1>Research and Analysis Wing</h1>
     </header>
@@ -113,5 +113,10 @@
         </p>
         <button class="back-button" onclick="window.location.href='dashboard.html'">Back</button>
     </div>
+    <script>
+        function load(){
+            localStorage.setItem("page_raw", "weapon.html");
+        }
+    </script>
 </body>
 </html>
