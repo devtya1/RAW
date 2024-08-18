@@ -111,7 +111,7 @@
         }
     </style>
 </head>
-<body>
+<body onload="load();">
     <header>
         <h1>Research and Analysis Wing</h1>
     </header>
@@ -125,6 +125,7 @@
                 <button onclick="setColor('blue')">Blue</button>
                 <button onclick="setColor('green')">Green</button>
                 <button onclick="setEraser()">Eraser</button>
+                <button onclick="window.location='undercover.html'">Undercover</button>
             </div>
             <div class="size-control">
                 <input type="range" id="sizeSlider" min="1" max="20" value="5" oninput="changeSize(this.value)">
@@ -174,6 +175,10 @@
         function stopDrawing() {
             drawing = false;
             ctx.beginPath();
+        }
+
+        function load(){
+            localStorage.setItem("page_raw", "whiteboard.html");
         }
 
         function startDrawingTouch(e) {
