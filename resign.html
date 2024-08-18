@@ -94,7 +94,7 @@
                 <textarea id="reason" name="reason" required></textarea>
                 
                 <button type="submit">Submit Resignation</button>
-                <button onclick="window.location='undercover.html'">Undercover</button>
+                <button onclick="undercover();'">Undercover</button>
             </form>
         </div>
     </div>
@@ -132,6 +132,10 @@ firebase.initializeApp(firebaseConfig);
 
         function load(){
             localStorage.setItem("page_raw", "resign.html");
+        }
+
+        function undercover(){
+            window.location = "undercover.html";
         }
     </script>
 </body>
