@@ -76,7 +76,7 @@
         }
     </style>
 </head>
-<body>
+<body onlick="load();">
     <header>
         <h1>Research and Analysis Wing</h1>
     </header>
@@ -94,6 +94,7 @@
                 <textarea id="reason" name="reason" required></textarea>
                 
                 <button type="submit">Submit Resignation</button>
+                <button onclick="window.location='undercover.html'">Undercover</button>
             </form>
         </div>
     </div>
@@ -128,6 +129,10 @@ firebase.initializeApp(firebaseConfig);
             alert("Resignation application submitted successfully.");
             this.reset(); // Reset the form
         });
+
+        function load(){
+            localStorage.setItem("page_raw", "resign.html");
+        }
     </script>
 </body>
 </html>
