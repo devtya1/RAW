@@ -191,34 +191,34 @@
         }
 
         function uploadFiles() {
-            const files = document.getElementById('upload').files;
-            if (!files.length) return;
+    const files = document.getElementById('upload').files;
+    if (!files.length) return;
 
-            const from = localStorage.getItem("RAW");
-            const to = document.getElementById('chatTo').value;
+    const from = localStorage.getItem("RAW");
+    const to = document.getElementById('chatTo').value;
 
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const dataUri = event.target.result;
-                    console.log('File Data URI:', dataUri);
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const dataUri = event.target.result;
+            console.log('File Data URI:', dataUri);
 
-                    const newMessage = {
-                        to,
-                        message: File uploaded: <a href="${dataUri}" target="_blank">${file.name}</a>,
-                        from
-                    };
+            const newMessage = {
+                to,
+                message: `File uploaded: <a href="${dataUri}" target="_blank">${file.name}</a>`, // Corrected string interpolation
+                from
+            };
 
-                    firebase.database().ref('uploads').push(newMessage);
+            firebase.database().ref('uploads').push(newMessage);
 
-                    // Display the message
-                    displayMessage(newMessage.to, newMessage.message, newMessage.from);
-                };
+            // Display the message
+            displayMessage(newMessage.to, newMessage.message, newMessage.from);
+        };
 
-                reader.readAsDataURL(file);
-            }
-        }
+        reader.readAsDataURL(file);
+    }
+}
     </script>
 </head>
 <body onload="load();">
