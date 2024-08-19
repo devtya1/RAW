@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuclear Launch Sequence</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+        body {
+            background: linear-gradient(to right, #141e30, #243b55);
+            color: #00FF00;
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            font-size: 4em;
+            color: #00FF00;
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            font-size: 2em;
+            color: #00FF00;
+            margin: 10px 0;
+        }
+
+        h3 {
+            font-size: 1.5em;
+            color: #00FF00;
+            margin: 5px 0;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .launch-container {
+            margin-top: 20px;
+        }
+
+        .launch-button {
+            background: #FF0000;
+            color: white;
+            padding: 20px;
+            font-size: 2em;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .launch-button:hover {
+            background: #FF4500;
+        }
+
+        .modal, .country-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #00FF00;
+            text-align: center;
+            padding-top: 200px;
+        }
+
+        .modal-content, .country-modal-content {
+            background-color: #111;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #333;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+        }
+
+        .modal input[type="text"], .country-modal select {
+            width: 80%;
+            padding: 10px;
+            font-size: 1.5em;
+            border-radius: 5px;
+            border: 1px solid #00FF00;
+            background-color: black;
+            color: #00FF00;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal .submit-code, .country-modal .submit-country {
+            background: #00FF00;
+            color: black;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .countdown-container {
+            display: none;
+            margin-top: 20px;
+            font-size: 3em;
+        }
+
+        .abort-button {
+            background: #FF0000;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1.5em;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .abort-button:hover {
+            background: #FF4500;
+        }
+
+        /* Error/Abort Screen Styles */
+        .error-screen {
+            display: none;
+            background-color: black;
+            color: #FF0000;
+            text-align: center;
+            height: 100vh;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 2;
+        }
+
+        .error-screen h1 {
+            margin-top: 20%;
+            font-size: 3em;
+        }
+
+        .flicker-light {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 0, 0, 0.2);
+            opacity: 0;
+            animation: flicker 0.1s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% {
+                opacity: 0.1;
+            }
+            100% {
+                opacity: 0.3;
+            }
+        }
+
+        /* Launch Screen Styles */
+        .launch-screen {
+            display: none;
+            position: fixed;
+            z-index: 3;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            color: #00FF00;
+            text-align: center;
+        }
+
+        .launch-screen h2 {
+            font-size: 3em;
+            margin-top: 20%;
+        }
+
+        .launch-screen video {
+            width: 80%;
+            height: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Heading -->
+    <h1>Nuclear Launch Sequence</h1>
+    <h3>Research and Analysis Wing</h3>
+
+    <!-- Launch Button -->
+    <div class="launch-container">
+        <button class="launch-button" id="launchButton" onclick="showCodeModal()">Launch!</button>
+    </div>
+
+    <!-- Modal for Code Entry -->
+    <div id="codeModal" class="modal">
+        <div class="modal-content">
+            <h2>Enter Launch Code</h2>
+            <input type="text" id="launchCode" placeholder="Enter Code">
+            <br>
+            <button class="submit-code" onclick="validateCode()">Submit</button>
+        </div>
+    </div>
+
+    <!-- Modal for Country Selection -->
+    <div id="countryModal" class="country-modal">
+        <div class="country-modal-content">
+            <h2>Select Target Country</h2>
+            <select id="countrySelect">
+                <option value="" disabled selected>Select Country</option>
+                <option value="United States">United States</option>
+                <option value="Russia">Russia</option>
+                <option value="China">China</option>
+                <option value="India">India</option>
+                <option value="United Kingdom">United Kingdom</option>
+                <option value="France">France</option>
+                <option value="North Korea">North Korea</option>
+                <!-- Add more countries as needed -->
+            </select>
+            <br>
+            <button class="submit-country" onclick="confirmCountry()">Select Country</button>
+        </div>
+    </div>
+
+    <!-- Countdown Timer -->
+    <div class="countdown-container" id="countdownContainer">
+        <h2 id="targetCountryHeading"></h2>
+        <div id="countdown"></div>
+        <button class="abort-button" onclick="abortLaunch()">Abort!</button>
+    </div>
+
+    <!-- Incorrect Code Screen -->
+    <div id="errorScreen" class="error-screen">
+        <div class="flicker-light"></div>
+        <h1>Incorrect Code - Access Denied!</h1>
+    </div>
+
+    <!-- Abort Screen -->
+    <div id="abortScreen" class="error-screen">
+        <div class="flicker-light"></div>
+        <h1>Missile Aborted!</h1>
+    </div>
+
+    <!-- Launch Screen -->
+    <div id="launchScreen" class="launch-screen">
+        <h2>Missile Launched!</h2>
+        <video src="https://yourdomain.com/path/to/1107498499-preview.mp4" autoplay muted></video>
+    </div>
+
+    <script>
+        let countdownInterval;
+
+        function showCodeModal() {
+            document.getElementById('codeModal').style.display = 'block';
+            document.getElementById('launchButton').style.display = 'none';
+        }
+
+        function validateCode() {
+            const code = document.getElementById('launchCode').value;
+            if (code === 'B662') {
+                document.getElementById('codeModal').style.display = 'none';
+                showCountryModal();
+            } else {
+                showErrorScreen("errorScreen");
+            }
+        }
+
+        function showCountryModal() {
+            document.getElementById('countryModal').style.display = 'block';
+        }
+
+        function confirmCountry() {
+            const selectedCountry = document.getElementById('countrySelect').value;
+            if (selectedCountry) {
+                document.getElementById('countryModal').style.display = 'none';
+                document.getElementById('targetCountryHeading').innerText = `Target - ${selectedCountry}`;
+                startCountdown();
+            }
+        }
+
+        function startCountdown() {
+            const countdownContainer = document.getElementById('countdownContainer');
+            countdownContainer.style.display = 'block';
+
+            const countdownElement = document.getElementById('countdown');
+            let totalMilliseconds = 60000;
+
+            countdownInterval = setInterval(function () {
+                const minutes = Math.floor(totalMilliseconds / 60000);
+                const seconds = Math.floor((totalMilliseconds % 60000) / 1000);
+                const milliseconds = totalMilliseconds % 1000;
+
+                countdownElement.innerHTML = 
+                    `${minutes.toString().padStart(2, '0')}:` +
+                    `${seconds.toString().padStart(2, '0')}:` +
+                    `${milliseconds.toString().padStart(3, '0')}`;
+
+                totalMilliseconds -= 10;
+
+                if (totalMilliseconds < 0) {
+                    clearInterval(countdownInterval);
+                    countdownElement.innerHTML = "00:00:000";
+                    setTimeout(showLaunchScreen, 200);
+                }
+            }, 10);
+        }
+
+        function showLaunchScreen() {
+            document.getElementById('countdownContainer').style.display = 'none';
+            document.getElementById('launchScreen').style.display = 'block';
+        }
+
+        function abortLaunch() {
+            clearInterval(countdownInterval);
+            document.getElementById('countdownContainer').style.display = 'none';
+            document.getElementById('launchButton').style.display = 'none';
+            showErrorScreen("abortScreen");
+        }
+
+        function showErrorScreen(screenId) {
+            document.getElementById('codeModal').style.display = 'none';
+            document.getElementById('countryModal').style.display = 'none';
+            document.getElementById('countdownContainer').style.display = 'none';
+            document.getElementById('errorScreen').style.display = 'none';
+            document.getElementById('abortScreen').style.display = 'none';
+            document.getElementById('launchScreen').style.display = 'none';
+            document.getElementById(screenId).style.display = 'block';
+        }
+    </script>
+</body>
+</html>
