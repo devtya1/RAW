@@ -129,7 +129,7 @@
         }
 
         /* Error/Abort Screen Styles */
-        .error-screen {
+        .error-screen, .abort-screen {
             display: none;
             background-color: black;
             color: #FF0000;
@@ -142,12 +142,12 @@
             z-index: 2;
         }
 
-        .error-screen h1 {
+        .error-screen h1, .abort-screen h1 {
             margin-top: 20%;
             font-size: 3em;
         }
 
-        .flicker-light {
+        .error-screen .flicker-light, .abort-screen .flicker-light {
             position: absolute;
             top: 0;
             left: 0;
@@ -167,6 +167,21 @@
             }
         }
 
+        .back-button {
+            background: #FF0000;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .back-button:hover {
+            background: #FF4500;
+        }
+
         /* Launch Screen Styles */
         .launch-screen {
             display: none;
@@ -179,17 +194,51 @@
             background: black;
             color: #00FF00;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         .launch-screen h2 {
             font-size: 3em;
-            margin-top: 20%;
+            margin-bottom: 20px;
         }
 
         .launch-screen video {
-            width: 80%;
-            height: auto;
-            margin-top: 20px;
+            max-width: 90%;
+            max-height: 80vh;
+            border: 2px solid #00FF00;
+            border-radius: 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            h3 {
+                font-size: 1em;
+            }
+
+            .launch-button {
+                font-size: 1.5em;
+                padding: 15px;
+            }
+
+            .abort-button, .back-button {
+                font-size: 1em;
+                padding: 10px;
+            }
+
+            .modal input[type="text"], .country-modal select {
+                font-size: 1em;
+            }
         }
     </style>
 </head>
@@ -244,22 +293,27 @@
     <div id="errorScreen" class="error-screen">
         <div class="flicker-light"></div>
         <h1>Incorrect Code - Access Denied!</h1>
+        <button class="back-button" onclick="hideErrorScreen()">Back</button>
     </div>
 
     <!-- Abort Screen -->
-    <div id="abortScreen" class="error-screen">
+    <div id="abortScreen" class="abort-screen">
         <div class="flicker-light"></div>
         <h1>Missile Aborted!</h1>
+        <button class="back-button" onclick="hideAbortScreen()">Back</button>
     </div>
 
     <!-- Launch Screen -->
     <div id="launchScreen" class="launch-screen">
         <h2>Missile Launched!</h2>
-        <video src="https://yourdomain.com/path/to/1107498499-preview.mp4" autoplay muted></video>
+        <video src="1107498499-preview.mp4" autoplay muted></video>
     </div>
+
+    <audio id="buzzerSound" src="buzzer.mp3"></audio>
 
     <script>
         let countdownInterval;
+        let buzzerSound = document.getElementById('buzzerSound');
 
         function showCodeModal() {
             document.getElementById('codeModal').style.display = 'block';
@@ -272,6 +326,7 @@
                 document.getElementById('codeModal').style.display = 'none';
                 showCountryModal();
             } else {
+                playBuzzer();
                 showErrorScreen("errorScreen");
             }
         }
@@ -325,7 +380,17 @@
             clearInterval(countdownInterval);
             document.getElementById('countdownContainer').style.display = 'none';
             document.getElementById('launchButton').style.display = 'none';
+            playBuzzer();
             showErrorScreen("abortScreen");
+        }
+
+        function playBuzzer() {
+            buzzerSound.play();
+        }
+
+        function stopBuzzer() {
+            buzzerSound.pause();
+            buzzerSound.currentTime = 0;
         }
 
         function showErrorScreen(screenId) {
@@ -336,6 +401,18 @@
             document.getElementById('abortScreen').style.display = 'none';
             document.getElementById('launchScreen').style.display = 'none';
             document.getElementById(screenId).style.display = 'block';
+        }
+
+        function hideErrorScreen() {
+            stopBuzzer();
+            document.getElementById('errorScreen').style.display = 'none';
+            document.getElementById('launchButton').style.display = 'block';
+        }
+
+        function hideAbortScreen() {
+            stopBuzzer();
+            document.getElementById('abortScreen').style.display = 'none';
+            document.getElementById('launchButton').style.display = 'block';
         }
     </script>
 </body>
