@@ -212,6 +212,11 @@
             border-radius: 10px;
         }
 
+        .launch-screen .countdown {
+            font-size: 2em;
+            margin-top: 20px;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             h1 {
@@ -306,7 +311,8 @@
     <!-- Launch Screen -->
     <div id="launchScreen" class="launch-screen">
         <h2>Missile Launched!</h2>
-        <video src="1107498499-preview.mp4" autoplay muted></video>
+        <video id="launchVideo" src="https://yourdomain.com/path/to/1107498499-preview.mp4" autoplay muted></video>
+        <div id="launchCountdown" class="countdown"></div>
     </div>
 
     <audio id="buzzerSound" src="buzzer.mp3"></audio>
@@ -314,6 +320,7 @@
     <script>
         let countdownInterval;
         let buzzerSound = document.getElementById('buzzerSound');
+        let launchVideo = document.getElementById('launchVideo');
 
         function showCodeModal() {
             document.getElementById('codeModal').style.display = 'block';
@@ -374,6 +381,23 @@
         function showLaunchScreen() {
             document.getElementById('countdownContainer').style.display = 'none';
             document.getElementById('launchScreen').style.display = 'block';
+            startPostLaunchCountdown();
+        }
+
+        function startPostLaunchCountdown() {
+            const countdownElement = document.getElementById('launchCountdown');
+            countdownElement.style.display = 'block';
+            let seconds = 10;
+
+            const postLaunchInterval = setInterval(function () {
+                countdownElement.innerHTML = `Redirecting in ${seconds} seconds...`;
+                seconds--;
+
+                if (seconds < 0) {
+                    clearInterval(postLaunchInterval);
+                    window.location.href = 'dashboard.html';
+                }
+            }, 1000);
         }
 
         function abortLaunch() {
