@@ -18,6 +18,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
             height: 100vh;
         }
 
@@ -42,11 +43,17 @@
             opacity: 0.8;
         }
 
-        .launch-container {
-            margin-top: 20px;
+        .launch-container, .modal-content, .country-modal-content, .countdown-container, .error-screen, .abort-screen, .launch-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
         }
 
-        .launch-button {
+        .launch-button, .abort-button, .back-button, .back-to-launch-button, .submit-code, .submit-country {
+            display: inline-block;
             background: #FF0000;
             color: white;
             padding: 20px;
@@ -54,25 +61,24 @@
             border: none;
             cursor: pointer;
             border-radius: 10px;
+            margin: 10px;
             transition: background 0.3s ease;
         }
 
-        .launch-button:hover {
+        .launch-button:hover, .abort-button:hover, .back-button:hover, .back-to-launch-button:hover {
             background: #FF4500;
         }
 
-        .modal, .country-modal {
-            display: none;
+        .modal, .country-modal, .error-screen, .abort-screen, .launch-screen {
             position: fixed;
-            z-index: 1;
+            z-index: 3;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
+            background: black;
             color: #00FF00;
             text-align: center;
-            padding-top: 200px;
         }
 
         .modal-content, .country-modal-content {
@@ -97,7 +103,7 @@
             text-align: center;
         }
 
-        .modal .submit-code, .country-modal .submit-country {
+        .submit-code, .submit-country {
             background: #00FF00;
             color: black;
             padding: 10px 20px;
@@ -113,22 +119,6 @@
             font-size: 3em;
         }
 
-        .abort-button {
-            background: #FF0000;
-            color: white;
-            padding: 10px 20px;
-            font-size: 1.5em;
-            border: none;
-            cursor: pointer;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-
-        .abort-button:hover {
-            background: #FF4500;
-        }
-
-        /* Error/Abort Screen Styles */
         .error-screen, .abort-screen {
             display: none;
             background-color: black;
@@ -167,22 +157,6 @@
             }
         }
 
-        .back-button {
-            background: #FF0000;
-            color: white;
-            padding: 10px 20px;
-            font-size: 1.2em;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-
-        .back-button:hover {
-            background: #FF4500;
-        }
-
-        /* Launch Screen Styles */
         .launch-screen {
             display: none;
             position: fixed;
@@ -217,28 +191,10 @@
             margin-top: 20px;
         }
 
-        /* Responsive Design */
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5em;
-            }
-
-            h2 {
-                font-size: 1.5em;
-            }
-
-            h3 {
-                font-size: 1em;
-            }
-
-            .launch-button {
+            .launch-button, .abort-button, .back-button, .back-to-launch-button, .submit-code, .submit-country {
                 font-size: 1.5em;
                 padding: 15px;
-            }
-
-            .abort-button, .back-button {
-                font-size: 1em;
-                padding: 10px;
             }
 
             .modal input[type="text"], .country-modal select {
@@ -298,14 +254,14 @@
     <div id="errorScreen" class="error-screen">
         <div class="flicker-light"></div>
         <h1>Incorrect Code - Access Denied!</h1>
-        <button class="back-button" onclick="hideErrorScreen()">Back</button>
+        <button class="back-button" onclick="returnToLaunchScreen()">Back</button>
     </div>
 
     <!-- Abort Screen -->
     <div id="abortScreen" class="abort-screen">
         <div class="flicker-light"></div>
-        <h1>Missile Aborted!</h1>
-        <button class="back-button" onclick="hideAbortScreen()">Back</button>
+        <h1>Missile Abort</h1>
+        <button class="back-to-launch-button" onclick="returnToLaunchScreen()">Back to Launch</button>
     </div>
 
     <!-- Launch Screen -->
@@ -313,14 +269,19 @@
         <h2>Missile Launched!</h2>
         <video id="launchVideo" src="1107498499-preview.mp4" autoplay muted></video>
         <div id="launchCountdown" class="countdown"></div>
+        <button class="back-to-launch-button" onclick="returnToLaunchScreen()">Back to Launch</button>
     </div>
 
     <audio id="buzzerSound" src="buzzer.mp3"></audio>
 
     <script>
         let countdownInterval;
+        let countdownContainer = document.getElementById('countdownContainer');
+        let launchScreen = document.getElementById('launchScreen');
+        let countdownElement = document.getElementById('countdown');
         let buzzerSound = document.getElementById('buzzerSound');
         let launchVideo = document.getElementById('launchVideo');
+        let launchCountdownElement = document.getElementById('launchCountdown');
 
         function showCodeModal() {
             document.getElementById('codeModal').style.display = 'block';
@@ -348,14 +309,13 @@
                 document.getElementById('countryModal').style.display = 'none';
                 document.getElementById('targetCountryHeading').innerText = `Target - ${selectedCountry}`;
                 startCountdown();
+            } else {
+                alert('Choose a country');
             }
         }
 
         function startCountdown() {
-            const countdownContainer = document.getElementById('countdownContainer');
             countdownContainer.style.display = 'block';
-
-            const countdownElement = document.getElementById('countdown');
             let totalMilliseconds = 60000;
 
             countdownInterval = setInterval(function () {
@@ -379,33 +339,37 @@
         }
 
         function showLaunchScreen() {
-            document.getElementById('countdownContainer').style.display = 'none';
-            document.getElementById('launchScreen').style.display = 'block';
+            countdownContainer.style.display = 'none';
+            launchScreen.style.display = 'block';
             startPostLaunchCountdown();
         }
 
         function startPostLaunchCountdown() {
-            const countdownElement = document.getElementById('launchCountdown');
-            countdownElement.style.display = 'block';
+            launchCountdownElement.style.display = 'block';
             let seconds = 10;
 
             const postLaunchInterval = setInterval(function () {
-                countdownElement.innerHTML = `Redirecting in ${seconds} seconds...`;
+                launchCountdownElement.innerHTML = `Redirecting in ${seconds} seconds...`;
                 seconds--;
 
                 if (seconds < 0) {
                     clearInterval(postLaunchInterval);
-                    window.location.href = 'dashboard.html';
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000); // Redirect after 1 second delay
                 }
             }, 1000);
         }
 
         function abortLaunch() {
             clearInterval(countdownInterval);
-            document.getElementById('countdownContainer').style.display = 'none';
+            countdownContainer.style.display = 'none';
             document.getElementById('launchButton').style.display = 'none';
             playBuzzer();
             showErrorScreen("abortScreen");
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 5000); // Redirect after 5 seconds
         }
 
         function playBuzzer() {
@@ -420,11 +384,15 @@
         function showErrorScreen(screenId) {
             document.getElementById('codeModal').style.display = 'none';
             document.getElementById('countryModal').style.display = 'none';
-            document.getElementById('countdownContainer').style.display = 'none';
+            countdownContainer.style.display = 'none';
             document.getElementById('errorScreen').style.display = 'none';
             document.getElementById('abortScreen').style.display = 'none';
-            document.getElementById('launchScreen').style.display = 'none';
+            launchScreen.style.display = 'none';
             document.getElementById(screenId).style.display = 'block';
+
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 5000); // Redirect after 5 seconds
         }
 
         function hideErrorScreen() {
@@ -435,6 +403,16 @@
 
         function hideAbortScreen() {
             stopBuzzer();
+            document.getElementById('abortScreen').style.display = 'none';
+            document.getElementById('launchButton').style.display = 'block';
+        }
+
+        function returnToLaunchScreen() {
+            launchScreen.style.display = 'none';
+            document.getElementById('countdownContainer').style.display = 'none';
+            document.getElementById('codeModal').style.display = 'none';
+            document.getElementById('countryModal').style.display = 'none';
+            document.getElementById('errorScreen').style.display = 'none';
             document.getElementById('abortScreen').style.display = 'none';
             document.getElementById('launchButton').style.display = 'block';
         }
