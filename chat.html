@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,7 +5,110 @@
     <title>Government Chat</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #222;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        header {
+            background-color: #1a1a1a;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 16px;
+            width: 100%;
+            color: black;
+            background-color: white;
+            font-weight: bold;
+            word-wrap: break-word;
+        }
+        .chat-input {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        h1 {
+            color: #00ffcc;
+        }
+        input, textarea {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            outline: none;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        textarea {
+            resize: none;
+            height: 60px;
+        }
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #1a1a1a;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        button:disabled {
+            background-color: #333;
+            cursor: not-allowed;
+        }
+        .scrolling-text {
+            background-color: red;
+            color: black;
+            font-weight: bold;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .warning-text {
+            display: inline-block;
+        }
+        @media (min-width: 600px) {
+            .chat-input {
+                flex-direction: row;
+                align-items: center;
+            }
+            input {
+                flex: 1;
+                margin-right: 10px;
+            }
+            textarea {
+                flex: 3;
+                margin-right: 10px;
+            }
+        }
+    </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script>
@@ -20,65 +122,52 @@
   messagingSenderId: "1030080536466",
   appId: "1:1030080536466:web:e335dc68be6f7cee7b6b4b"
 };
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
         
         var messageCount = 0;
 
         function load() {
-            console.log("Loading chat messages...");
             localStorage.setItem("page_raw", "chat.html");
             const messagesRef = firebase.database().ref('messages');
-            
             messagesRef.on('child_added', (snapshot) => {
                 const message = snapshot.val();
-                console.log("New message received:", message);
                 displayMessage(message.to, message.message, message.from);
             });
-
             const uploadsRef = firebase.database().ref('uploads');
             uploadsRef.on('child_added', (snapshot) => {
                 const uploads = snapshot.val();
-                console.log("New upload received:", uploads);
                 displayMessage(uploads.to, uploads.message, uploads.from);
             });
         }
-
+        
         function send() {
             const to = document.getElementById('chatTo').value;
             const from = localStorage.getItem("RAW");
             const message = document.getElementById('chatMessage').value;
-
-            console.log(`Attempting to send message. To: ${to}, From: ${from}, Message: ${message}`);
-
+            
             if (to && message && from) {
-                const newMessage = { to, message, from };
+                const newMessage = {
+                    to,
+                    message,
+                    from
+                };
                 
-                firebase.database().ref('messages').push(newMessage)
-                    .then(() => {
-                        console.log("Message sent successfully:", newMessage);
-                    })
-                    .catch((error) => {
-                        console.error("Error sending message:", error);
-                    });
-
+                firebase.database().ref('messages').push(newMessage);
+                
                 // Clear input fields
                 document.getElementById('chatTo').value = '';
                 document.getElementById('chatMessage').value = '';
-            } else {
-                console.error("Missing required fields: 'to', 'message', or 'from'.");
             }
         }
-
+        
         function displayMessage(to, message, from) {
             const messagesDiv = document.getElementById('chatBox');
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message';
-            messageDiv.innerHTML = `Message: ${message}<br> From: ${from} &nbsp; to: ${to}`;
+            messageDiv.innerHTML = 'Message: ' + message + '<br> From: ' + from + ' &nbsp; to: ' + to;
             messagesDiv.appendChild(messageDiv);
-
-            console.log("Displayed message:", { to, message, from });
 
             // Scroll to the bottom
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -88,13 +177,11 @@ firebase.initializeApp(firebaseConfig);
             
             // Delete all messages if there are three messages
             if (messageCount >= 3) {
-                console.log("Message count exceeded limit, clearing all messages.");
                 clearAllMessages();
             }
         }
 
         function clearAllMessages() {
-            console.log("Clearing all messages from Firebase.");
             // Remove all messages from Firebase
             firebase.database().ref('messages').remove();
             firebase.database().ref('uploads').remove();
@@ -110,29 +197,20 @@ firebase.initializeApp(firebaseConfig);
             const from = localStorage.getItem("RAW");
             const to = document.getElementById('chatTo').value;
 
-            console.log(`Uploading files. To: ${to}, From: ${from}`);
-
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 const reader = new FileReader();
-
                 reader.onload = function(event) {
                     const dataUri = event.target.result;
-                    console.log(`File Data URI for ${file.name}:`, dataUri);
+                    console.log('File Data URI:', dataUri);
 
                     const newMessage = {
                         to,
-                        message: `File uploaded: <a href="${dataUri}" target="_blank">${file.name}</a>`,
+                        message: File uploaded: <a href="${dataUri}" target="_blank">${file.name}</a>,
                         from
                     };
 
-                    firebase.database().ref('uploads').push(newMessage)
-                        .then(() => {
-                            console.log("File uploaded successfully:", newMessage);
-                        })
-                        .catch((error) => {
-                            console.error("Error uploading file:", error);
-                        });
+                    firebase.database().ref('uploads').push(newMessage);
 
                     // Display the message
                     displayMessage(newMessage.to, newMessage.message, newMessage.from);
