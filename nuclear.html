@@ -10,7 +10,7 @@
         body {
             background: linear-gradient(to right, #141e30, #243b55);
             color: #00FF00;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Orbitron', sans-serif; /* Updated to Orbitron */
             text-align: center;
             padding: 0;
             margin: 0;
@@ -63,6 +63,7 @@
             border-radius: 10px;
             margin: 10px;
             transition: background 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
         }
 
         .launch-button:hover, .abort-button:hover, .back-button:hover, .back-to-launch-button:hover {
@@ -101,6 +102,7 @@
             color: #00FF00;
             margin-bottom: 20px;
             text-align: center;
+            font-family: 'Orbitron', sans-serif;
         }
 
         .submit-code, .submit-country {
@@ -111,12 +113,36 @@
             border: none;
             cursor: pointer;
             border-radius: 5px;
+            font-family: 'Orbitron', sans-serif;
         }
 
         .countdown-container {
             display: none;
-            margin-top: 20px;
-            font-size: 3em;
+            background: rgba(0, 0, 0, 0.8); /* Dark semi-transparent background */
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #FF0000;
+            box-shadow: 0 0 20px #FF0000;
+            font-size: 3em; /* Adjusted font size */
+            color: #FF0000; /* Red for urgency */
+            text-shadow: 0 0 10px #FF0000, 0 0 20px #FF0000, 0 0 30px #FF0000; /* Glow effect */
+            letter-spacing: 0.1em;
+            animation: flicker 0.5s infinite alternate; /* Subtle flicker effect */
+        }
+
+        @keyframes flicker {
+            0% {
+                opacity: 1;
+                text-shadow: 0 0 10px #FF0000, 0 0 20px #FF0000, 0 0 30px #FF0000;
+            }
+            50% {
+                opacity: 0.9;
+                text-shadow: 0 0 5px #FF0000, 0 0 15px #FF0000, 0 0 25px #FF0000;
+            }
+            100% {
+                opacity: 1;
+                text-shadow: 0 0 10px #FF0000, 0 0 20px #FF0000, 0 0 30px #FF0000;
+            }
         }
 
         .error-screen, .abort-screen {
@@ -148,15 +174,6 @@
             animation: flicker 0.1s infinite alternate;
         }
 
-        @keyframes flicker {
-            0% {
-                opacity: 0.1;
-            }
-            100% {
-                opacity: 0.3;
-            }
-        }
-
         .launch-screen {
             display: none;
             position: fixed;
@@ -175,13 +192,13 @@
         }
 
         .launch-screen h2 {
-            font-size: 3em;
+            font-size: 2.5em;
             margin-bottom: 20px;
         }
 
         .launch-screen video {
             max-width: 90%;
-            max-height: 80vh;
+            max-height: 60vh; /* Adjusted max height */
             border: 2px solid #00FF00;
             border-radius: 10px;
         }
@@ -245,12 +262,12 @@
 
     <!-- Countdown Timer -->
     <div class="countdown-container" id="countdownContainer">
-        <h2 id="targetCountryHeading"></h2>
+        <h4 id="targetCountryHeading"></h4>
         <div id="countdown"></div>
-        <button class="abort-button" onclick="abortLaunch()">Abort!</button>
+        <button class="abort-button" onclick="abortLaunch()">Abort</button>
     </div>
 
-    <!-- Incorrect Code Screen -->
+    <!-- Error Screen -->
     <div id="errorScreen" class="error-screen">
         <div class="flicker-light"></div>
         <h1>Incorrect Code - Access Denied!</h1>
@@ -266,7 +283,7 @@
 
     <!-- Launch Screen -->
     <div id="launchScreen" class="launch-screen">
-        <h2>Missile Launched!</h2>
+        <h2 id="launched">Missile Launched!</h2>
         <video id="launchVideo" src="1107498499-preview.mp4" autoplay muted></video>
         <div id="launchCountdown" class="countdown"></div>
         <button class="back-to-launch-button" onclick="returnToLaunchScreen()">Back to Launch</button>
@@ -282,6 +299,15 @@
         let buzzerSound = document.getElementById('buzzerSound');
         let launchVideo = document.getElementById('launchVideo');
         let launchCountdownElement = document.getElementById('launchCountdown');
+
+        window.onload = function() {
+            document.getElementById("launched").style.display = "none";
+            setTimeout(function() {
+                localStorage.setItem('nuclear', 'true');
+                returnToLaunchScreen();
+                document.getElementById("launched").style.display = "block";
+            }, 600);
+        };
 
         function showCodeModal() {
             document.getElementById('codeModal').style.display = 'block';
@@ -346,7 +372,7 @@
 
         function startPostLaunchCountdown() {
             launchCountdownElement.style.display = 'block';
-            let seconds = 10;
+            let seconds = 8;
 
             const postLaunchInterval = setInterval(function () {
                 launchCountdownElement.innerHTML = `Redirecting in ${seconds} seconds...`;
@@ -356,7 +382,7 @@
                     clearInterval(postLaunchInterval);
                     setTimeout(() => {
                         window.location.href = 'dashboard.html';
-                    }, 1000); // Redirect after 1 second delay
+                    }, 10); // Redirect after 1 second delay
                 }
             }, 1000);
         }
