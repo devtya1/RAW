@@ -122,7 +122,7 @@
         }
     </style>
 </head>
-<body>
+<body onload="simulate();">
     <h1>Missile Trajectory Simulation</h1>
     <div id="warningMessage">⚠️ Warning: Rising Temperature of Turbo Prop ⚠️</div>
     <div class="container">
@@ -131,7 +131,6 @@
             <p><strong>Launch Angle:</strong> 30°</p>
             <p><strong>Weight:</strong> 1200 kg</p>
         </div>
-        <button onclick="simulate()">Launch Missile</button>
         <button onclick="promptAbort()">Abort Missile</button>
         <canvas id="trajectoryCanvas"></canvas>
     </div>
