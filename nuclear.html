@@ -290,6 +290,7 @@
     </div>
 
     <audio id="buzzerSound" src="buzzer.mp3"></audio>
+    <audio id="beepSound" src="beep-07a.mp3" preload="auto"></audio>
 
     <script>
         let countdownInterval;
@@ -297,9 +298,10 @@
         let launchScreen = document.getElementById('launchScreen');
         let countdownElement = document.getElementById('countdown');
         let buzzerSound = document.getElementById('buzzerSound');
+        let beepSound = document.getElementById('beepSound'); // Reference to the beep sound
         let launchVideo = document.getElementById('launchVideo');
         let launchCountdownElement = document.getElementById('launchCountdown');
-
+    
         window.onload = function() {
             document.getElementById("launched").style.display = "none";
             setTimeout(function() {
@@ -308,12 +310,12 @@
                 document.getElementById("launched").style.display = "block";
             }, 600);
         };
-
+    
         function showCodeModal() {
             document.getElementById('codeModal').style.display = 'block';
             document.getElementById('launchButton').style.display = 'none';
         }
-
+    
         function validateCode() {
             const code = document.getElementById('launchCode').value;
             if (code === 'B662') {
@@ -324,11 +326,11 @@
                 showErrorScreen("errorScreen");
             }
         }
-
+    
         function showCountryModal() {
             document.getElementById('countryModal').style.display = 'block';
         }
-
+    
         function confirmCountry() {
             const selectedCountry = document.getElementById('countrySelect').value;
             if (selectedCountry) {
@@ -339,45 +341,59 @@
                 alert('Choose a country');
             }
         }
-
+    
+        function playBeep() {
+            beepSound.play(); // Play the beep sound
+        }
+    
         function startCountdown() {
             countdownContainer.style.display = 'block';
             let totalMilliseconds = 60000;
-
+            let previousSeconds = Math.floor(totalMilliseconds / 1000);
+    
             countdownInterval = setInterval(function () {
                 const minutes = Math.floor(totalMilliseconds / 60000);
                 const seconds = Math.floor((totalMilliseconds % 60000) / 1000);
                 const milliseconds = totalMilliseconds % 1000;
-
+    
                 countdownElement.innerHTML = 
                     `${minutes.toString().padStart(2, '0')}:` +
                     `${seconds.toString().padStart(2, '0')}:` +
                     `${milliseconds.toString().padStart(3, '0')}`;
-
+    
                 totalMilliseconds -= 10;
-
+    
+                // Play beep sound every second
+                const currentSeconds = Math.floor(totalMilliseconds / 1000);
+                if (currentSeconds !== previousSeconds) {
+                    playBeep();
+                    previousSeconds = currentSeconds;
+                }
+    
                 if (totalMilliseconds < 0) {
                     clearInterval(countdownInterval);
                     countdownElement.innerHTML = "00:00:000";
+                    beepSound.pause(); // Stop the beep sound when countdown ends
+                    beepSound.currentTime = 0; // Reset audio to start
                     setTimeout(showLaunchScreen, 200);
                 }
             }, 10);
         }
-
+    
         function showLaunchScreen() {
             countdownContainer.style.display = 'none';
             launchScreen.style.display = 'block';
             startPostLaunchCountdown();
         }
-
+    
         function startPostLaunchCountdown() {
             launchCountdownElement.style.display = 'block';
-            let seconds = 8;
-
+            let seconds = 9;
+    
             const postLaunchInterval = setInterval(function () {
                 launchCountdownElement.innerHTML = `Redirecting in ${seconds} seconds...`;
                 seconds--;
-
+    
                 if (seconds < 0) {
                     clearInterval(postLaunchInterval);
                     setTimeout(() => {
@@ -386,27 +402,28 @@
                 }
             }, 1000);
         }
-
+    
         function abortLaunch() {
             clearInterval(countdownInterval);
             countdownContainer.style.display = 'none';
             document.getElementById('launchButton').style.display = 'none';
             playBuzzer();
+            beepSound.pause();
             showErrorScreen("abortScreen");
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
             }, 5000); // Redirect after 5 seconds
         }
-
+    
         function playBuzzer() {
             buzzerSound.play();
         }
-
+    
         function stopBuzzer() {
             buzzerSound.pause();
             buzzerSound.currentTime = 0;
         }
-
+    
         function showErrorScreen(screenId) {
             document.getElementById('codeModal').style.display = 'none';
             document.getElementById('countryModal').style.display = 'none';
@@ -415,24 +432,24 @@
             document.getElementById('abortScreen').style.display = 'none';
             launchScreen.style.display = 'none';
             document.getElementById(screenId).style.display = 'block';
-
+    
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
             }, 5000); // Redirect after 5 seconds
         }
-
+    
         function hideErrorScreen() {
             stopBuzzer();
             document.getElementById('errorScreen').style.display = 'none';
             document.getElementById('launchButton').style.display = 'block';
         }
-
+    
         function hideAbortScreen() {
             stopBuzzer();
             document.getElementById('abortScreen').style.display = 'none';
             document.getElementById('launchButton').style.display = 'block';
         }
-
+    
         function returnToLaunchScreen() {
             launchScreen.style.display = 'none';
             document.getElementById('countdownContainer').style.display = 'none';
@@ -443,5 +460,7 @@
             document.getElementById('launchButton').style.display = 'block';
         }
     </script>
-</body>
-</html>
+    
+    
+    </body>
+    </html>
