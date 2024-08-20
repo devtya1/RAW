@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missile Trajectory Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #282c34;
+            color: white;
+            transition: background-color 0.3s;
+            overflow: hidden;
+        }
+        h1 {
+            margin-top: 20px;
+            color: #61dafb;
+        }
+        #warningMessage {
+            margin: 20px;
+            font-size: 24px;
+            color: red;
+            visibility: hidden;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .details {
+            text-align: left;
+            margin-bottom: 20px;
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        canvas {
+            background-color: #1c1c1c;
+            border: 1px solid #555;
+            border-radius: 10px;
+            margin-top: 20px;
+            width: 100%;
+            height: auto;
+            max-height: 400px; /* Limit the height to fit the screen */
+        }
+        button {
+            background-color: #61dafb;
+            color: #282c34;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #21a1f1;
+        }
+        @keyframes flicker {
+            0% { background-color: #ff0000; }
+            50% { background-color: #8b0000; }
+            100% { background-color: #ff0000; }
+        }
+        .warning {
+            animation: flicker 0.5s infinite;
+        }
+        .hidden {
+            display: none;
+        }
+        #codePrompt {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px black;
+            width: 80%;
+            max-width: 400px; /* Limit the width of the prompt */
+        }
+        #codePrompt input {
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            width: calc(100% - 20px); /* Full width minus padding */
+        }
+        #abortModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            overflow: hidden;
+        }
+        #abortModalContent {
+            background-color: red;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            animation: flicker 0.5s infinite;
+            width: 90%;
+            max-width: 500px; /* Limit the width of the modal */
+        }
+        #abortModalContent h2 {
+            color: white;
+            font-size: 36px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Missile Trajectory Simulation</h1>
+    <div id="warningMessage">⚠️ Warning: Rising Temperature of Turbo Prop ⚠️</div>
+    <div class="container">
+        <div class="details">
+            <p><strong>Initial Speed:</strong> 600 m/s</p>
+            <p><strong>Launch Angle:</strong> 30°</p>
+            <p><strong>Weight:</strong> 1200 kg</p>
+        </div>
+        <button onclick="simulate()">Launch Missile</button>
+        <button onclick="promptAbort()">Abort Missile</button>
+        <canvas id="trajectoryCanvas"></canvas>
+    </div>
+
+    <div id="codePrompt" class="hidden">
+        <p>Enter Abort Code:</p>
+        <input type="password" id="abortCode">
+        <button onclick="abortMissile()">Enter</button>
+    </div>
+
+    <div id="abortModal">
+        <div id="abortModalContent">
+            <h2>Missile Aborted!</h2>
+        </div>
+    </div>
+
+    <audio id="buzzer" src="buzzer.mp3"></audio> <!-- Reference to the buzzer sound -->
+
+    <script>
+        let animationFrame; // Store the animation frame for cancellation
+        let isAborted = false; // Track if the missile has been aborted
+
+        function simulate() {
+            isAborted = false; // Reset abort status
+            const initialSpeed = 600; // m/s
+            const launchAngle = 30;   // degrees
+            const g = 9.81;           // Gravity (m/s^2)
+            const buzzer = document.getElementById("buzzer"); // Get the buzzer element
+
+            const canvas = document.getElementById('trajectoryCanvas');
+            const ctx = canvas.getContext('2d');
+            const canvasWidth = canvas.clientWidth;
+            const canvasHeight = canvas.clientHeight;
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+            const angleRadians = launchAngle * (Math.PI / 180);
+            const totalTime = (2 * initialSpeed * Math.sin(angleRadians)) / g;
+            const interval = 20; // Time interval for updating position
+            let t = 0;
+            let previousY = 0;
+            let warningTriggered = false;
+
+            // Scale factors to fit the trajectory on the canvas
+            const scaleX = canvasWidth / (initialSpeed * totalTime * Math.cos(angleRadians));
+            const scaleY = canvasHeight / ((initialSpeed * Math.sin(angleRadians)) ** 2 / (2 * g));
+
+            function update() {
+                if (t <= totalTime && !isAborted) {
+                    const x = initialSpeed * t * Math.cos(angleRadians);
+                    const y = initialSpeed * t * Math.sin(angleRadians) - 0.5 * g * t * t;
+
+                    // Draw the missile as a moving dot
+                    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+                    ctx.beginPath();
+                    ctx.arc(x * scaleX, canvasHeight - y * scaleY, 5, 0, 2 * Math.PI);
+                    ctx.fillStyle = 'red';
+                    ctx.fill();
+
+                    // Draw the trajectory path
+                    ctx.beginPath();
+                    ctx.moveTo(0, canvasHeight);
+                    for (let i = 0; i <= t; i += interval / 1000) {
+                        const xPath = initialSpeed * i * Math.cos(angleRadians);
+                        const yPath = initialSpeed * i * Math.sin(angleRadians) - 0.5 * g * i * i;
+                        ctx.lineTo(xPath * scaleX, canvasHeight - yPath * scaleY);
+                    }
+                    ctx.strokeStyle = 'lime';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Check if the missile has started descending
+                    if (y < previousY && !warningTriggered) {
+                        document.body.classList.add("warning"); // Add flicker effect
+                        buzzer.play(); // Play the buzzer sound
+                        showWarningMessage(); // Show warning message
+                        warningTriggered = true;
+                    }
+
+                    previousY = y;
+                    t += interval / 1000;
+                    animationFrame = requestAnimationFrame(update);
+                }
+            }
+
+            update();
+        }
+
+        function promptAbort() {
+            document.getElementById("codePrompt").classList.remove("hidden");
+        }
+
+        function abortMissile() {
+            const code = document.getElementById("abortCode").value;
+            const correctCode = "B662"; // Set the correct abort code
+
+            if (code === correctCode) {
+                cancelAnimationFrame(animationFrame); // Stop the missile animation
+                isAborted = true;
+                document.getElementById("codePrompt").classList.add("hidden");
+                showAbortModal(); // Display the custom abort modal
+            } else {
+                alert("Incorrect Code!");
+            }
+        }
+
+        function showWarningMessage() {
+            const warningMessage = document.getElementById("warningMessage");
+            warningMessage.style.visibility = 'visible'; // Show the warning message
+        }
+
+        function showAbortModal() {
+            const abortModal = document.getElementById("abortModal");
+            abortModal.style.visibility = 'visible'; // Make the abort modal visible
+        }
+
+        // Adjust the canvas size when the window is resized
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('trajectoryCanvas');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = Math.min(canvas.parentElement.clientWidth * 0.5, 400); // Maintain aspect ratio
+        });
+
+        // Initialize canvas size on page load
+        window.addEventListener('load', () => {
+            const canvas = document.getElementById('trajectoryCanvas');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = Math.min(canvas.parentElement.clientWidth * 0.5, 400); // Maintain aspect ratio
+        });
+    </script>
+</body>
+</html>
