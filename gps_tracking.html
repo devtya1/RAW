@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracking and Triangulating</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #1e1e2f;
+            color: #c9d1d9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: #3fa7d6;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-bottom: 2px solid #3fa7d6;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #29293d;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 800px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-container, .coordinates {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+        }
+
+        .map-container.show, .coordinates.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .loading p {
+            font-size: 1.5rem;
+            color: #c9d1d9;
+            margin: 0;
+        }
+
+        .spinner {
+            border: 8px solid #29293d;
+            border-top: 8px solid #3fa7d6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: #29293d;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            color: #c9d1d9;
+            text-align: center;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .modal-content h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #3fa7d6;
+        }
+
+        .modal-content p {
+            margin-top: 15px;
+            font-size: 1.2rem;
+        }
+
+        .nav-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .nav-buttons a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 1.1rem;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: 2px solid #3fa7d6;
+            background-color: #29293d;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .nav-buttons a:hover {
+            background-color: #3fa7d6;
+            color: #29293d;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Tracking and Triangulating</h1>
+    </div>
+
+    <!-- Triangulating Modal -->
+    <div class="modal" id="triangulatingModal">
+        <div class="modal-content">
+            <h2>Triangulating</h2>
+            <p>Initializing code...</p>
+            <p>Enabling GPS...</p>
+            <p>Fetching location data...</p>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading location...</p>
+        </div>
+        <div class="map-container" id="mapContainer">
+            <iframe id="mapFrame" src="" frameborder="0" style="width: 100%; height: 100%; border: none;" allowfullscreen="" loading="lazy"></iframe>
+        </div>
+        <div class="coordinates" id="coordinates">
+            <h2>Current Location</h2>
+            <p id="latitude">Latitude: </p>
+            <p id="longitude">Longitude: </p>
+        </div>
+        <div class="nav-buttons">
+            <a href="undercover.html">Back Undercover</a>
+            <a href="dashboard.html">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        function showTriangulatingModal() {
+            const modal = document.getElementById('triangulatingModal');
+            modal.classList.add('show');
+            
+            setTimeout(() => {
+                modal.classList.remove('show');
+                document.getElementById('loading').style.display = 'block';
+            }, 3000); // Duration for modal to show (3 seconds)
+        }
+
+        function updateMap(latitude, longitude) {
+            const zoom = 15;  // Zoom level
+
+            // Construct the URL for the Google Maps iframe
+            const mapUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3782.0636317952553!2d${longitude}!3d${latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2c0d6b7b16cd1%3A0xf48761a370f0648!2sUttam%20Townscapes%2C%20154%2C%20Husen%20Shah%20Baba%20Rd%2C%20opp.%20Serene%20Hospital%2C%20Maji%20Sainik%20Nagar%2C%20Kasturba%20Housing%20Society%2C%20Vishrantwadi%2C%20Pune%2C%20Maharashtra%20411006!5e0!3m2!1sen!2sin!4v1724855813500!5m2!1sen!2sin&z=${zoom}`;
+
+            document.getElementById('mapFrame').src = mapUrl;
+        }
+
+        function updateCoordinates(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            document.getElementById('latitude').innerText = `Latitude: ${latitude}`;
+            document.getElementById('longitude').innerText = `Longitude: ${longitude}`;
+
+            updateMap(latitude, longitude);
+
+            // Hide loading animation and show content with futuristic animation
+            setTimeout(() => {
+                document.getElementById('loading').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('mapContainer').classList.add('show');
+                    document.getElementById('coordinates').classList.add('show');
+                }, 1000);  // Delay to match fade out animation
+            }, 1000);  // Delay before starting the animation
+        }
+
+        function handleError(error) {
+            console.error('Error getting location:', error);
+            document.getElementById('latitude').innerText = 'Latitude: Error';
+            document.getElementById('longitude').innerText = 'Longitude: Error';
+
+            // Hide loading animation and show content with an error message
+            setTimeout(() => {
+                document.getElementById('loading').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('coordinates').classList.add('show');
+                }, 1000);  // Delay to match fade out animation
+            }, 1000);  // Delay before starting the animation
+        }
+
+        if (navigator.geolocation) {
+            showTriangulatingModal();  // Show the triangulating modal before loading location
+            navigator.geolocation.getCurrentPosition(updateCoordinates, handleError);
+        } else {
+            document.getElementById('coordinates').innerHTML = '<p>Geolocation is not supported by this browser.</p>';
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('coordinates').classList.add('show');
+        }
+    </script>
+</body>
+</html>
