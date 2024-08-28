@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Analysis Wing - Creeta Car Details</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #1e1e2f;
+            color: #c9d1d9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: #3fa7d6;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-bottom: 2px solid #3fa7d6;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #29293d;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 600px;
+            position: relative; /* For button positioning */
+        }
+
+        .light-indicator {
+            margin-bottom: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: red;
+            box-shadow: 0 0 30px 10px red;
+            transition: background-color 0.5s, box-shadow 0.5s;
+        }
+
+        .connected {
+            background-color: #2ea043 !important;
+            box-shadow: 0 0 30px 10px #2ea043 !important;
+        }
+
+        .status {
+            margin-top: 20px;
+            font-size: 1.6rem;
+            color: #8b949e;
+        }
+
+        .car-details {
+            margin-top: 30px;
+            display: none;
+            background-color: #38384e;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 1.2rem;
+            color: #c9d1d9;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .car-details h2 {
+            margin-top: 0;
+            font-size: 1.8rem;
+            color: #3fa7d6;
+            border-bottom: 2px solid #3fa7d6;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .car-details ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .car-details li {
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+
+        .track-button {
+            position: absolute;
+            bottom: 20px; /* Adjust position from the bottom */
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            font-size: 1.3rem;
+            color: #ffffff;
+            background-color: #3fa7d6;
+            border: 2px solid #3fa7d6;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            display: none; /* Hide button initially */
+        }
+
+        .track-button:hover {
+            background-color: #2ea043;
+            border-color: #2ea043;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            transform: translateX(-50%) scale(1.05);
+        }
+
+        .track-button:active {
+            background-color: #1d8f2a;
+            border-color: #1d8f2a;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transform: translateX(-50%) scale(0.95);
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+        }
+
+        .modal-content {
+            background-color: #2d2d44;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: #3fa7d6;
+            margin-bottom: 20px;
+        }
+
+        .modal-content p {
+            font-size: 1.1rem;
+            margin: 5px 0;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .modal-content .dots {
+            display: inline-block;
+            margin-left: 5px;
+            font-size: 1.2rem;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 20% {
+                color: #3fa7d6;
+            }
+            50% {
+                color: transparent;
+            }
+            100% {
+                color: #3fa7d6;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Research Analysis Wing</h1>
+    </div>
+    
+    <div class="container">
+        <div class="light-indicator" id="light"></div>
+        <div class="status" id="status">
+            Shake your device to connect...
+        </div>
+        <div class="car-details" id="carDetails">
+            <h2>Car Details</h2>
+            <ul>
+                <li><strong>Model:</strong> Creeta X1</li>
+                <li><strong>Engine:</strong> 2.0L Turbocharged Inline-4</li>
+                <li><strong>Horsepower:</strong> 250 HP</li>
+                <li><strong>Top Speed:</strong> 240 km/h</li>
+                <li><strong>Color:</strong> Midnight Black</li>
+                <li><strong>Transmission:</strong> 8-speed Automatic</li>
+                <li><strong>Fuel Efficiency:</strong> 30 MPG (Highway)</li>
+                <li><strong>0-60 mph:</strong> 5.8 seconds</li>
+            </ul>
+        </div>
+        <button class="track-button" id="trackButton">Track Car</button>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="connectingModal">
+        <div class="modal-content">
+            <h3>Connecting to Bug...</h3>
+            <p id="line1">Initializing Code<span class="dots">...</span></p>
+            <p id="line2">Enabling GPS<span class="dots">...</span></p>
+            <p id="line3">Establishing Secure Connection<span class="dots">...</span></p>
+        </div>
+    </div>
+
+    <script>
+        let modalShown = false;  // Flag to ensure modal only appears once
+
+        // Helper function to show the modal
+        function showModal() {
+            const modal = document.getElementById('connectingModal');
+            modal.style.display = 'flex';
+            
+            // Display each line one by one
+            setTimeout(() => document.getElementById('line1').style.opacity = 1, 500);
+            setTimeout(() => document.getElementById('line2').style.opacity = 1, 1500);
+            setTimeout(() => document.getElementById('line3').style.opacity = 1, 2500);
+
+            // Hide modal after 3 seconds
+            setTimeout(hideModal, 3500);
+        }
+
+        // Helper function to hide the modal
+        function hideModal() {
+            document.getElementById('connectingModal').style.display = 'none';
+            document.getElementById('status').innerText = 'Connected';
+            document.getElementById('carDetails').style.display = 'block';
+            document.getElementById('trackButton').style.display = 'inline-block';
+            document.getElementById('light').classList.add('connected');
+        }
+
+        // Check if the device has motion sensors
+        if (window.DeviceMotionEvent) {
+            window.addEventListener('devicemotion', function(event) {
+                if (!modalShown) {
+                    var acceleration = event.accelerationIncludingGravity;
+                    var shake = Math.sqrt(acceleration.x * acceleration.x + acceleration.y * acceleration.y + acceleration.z * acceleration.z);
+                    
+                    if (shake > 25) { // Adjust threshold as needed
+                        showModal();
+                        modalShown = true;  // Ensure modal is shown only once
+                    }
+                }
+            });
+        } else {
+            document.getElementById('status').innerText = 'Device motion not supported.';
+        }
+
+        // Redirect to track.html when the button is clicked
+        document.getElementById('trackButton').addEventListener('click', function() {
+            window.location.href = 'test.html';
+        });
+    </script>
+</body>
+</html>
