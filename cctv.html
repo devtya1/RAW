@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced CCTV Monitoring</title>
+    <style>
+        /* Global Styling */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0b0c10;
+            color: #66fcf1;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            padding: 20px 0;
+            margin: 0;
+            font-size: 2.5rem;
+            background-color: #1f2833;
+            color: #66fcf1;
+            letter-spacing: 3px;
+            border-bottom: 2px solid #45a29e;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            justify-content: center;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .camera-view {
+            background-color: #1f2833;
+            border: 2px solid #45a29e;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
+            overflow: hidden;
+            height: 300px;
+        }
+
+        .camera-title {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            z-index: 3;
+        }
+
+        .camera-timestamp {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            z-index: 3;
+        }
+
+        .camera-location {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            z-index: 3;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px;
+        }
+
+        .button {
+            background-color: #45a29e;
+            color: #0b0c10;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #66fcf1;
+            color: #0b0c10;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>CCTV Monitoring Dashboard</h1>
+    
+    <div class="container">
+        <!-- Camera 1 - Dynamic Stream -->
+        <div class="camera-view">
+            <img id="camera-1" src="http://125.17.248.94:8080/cgi-bin/viewer/video.jpg?r=1726198492" alt="Vision 1">
+            <div class="camera-title">Vision 1</div>
+            <div class="camera-timestamp" id="timestamp-1"></div>
+            <div class="camera-location">Maharashtra, India</div>
+        </div>
+
+        <!-- Camera 2 - Static Stream -->
+        <div class="camera-view">
+            <img id="camera-2" src="http://83.91.176.170:80/mjpg/video.mjpg" alt="Vision 2">
+            <div class="camera-title">Vision 2</div>
+            <div class="camera-timestamp" id="timestamp-2"></div>
+            <div class="camera-location">Tranbjerg, Denmark</div>
+        </div>
+
+        <!-- Camera 3 - Dynamic Stream -->
+        <div class="camera-view">
+            <img id="camera-3" src="http://103.217.216.197:8001/jpg/image.jpg?1726199648" alt="Vision 3">
+            <div class="camera-title">Vision 3</div>
+            <div class="camera-timestamp" id="timestamp-3"></div>
+            <div class="camera-location">Bekasi, Indonesia</div>
+        </div>
+
+        <!-- Camera 4 - Static Stream -->
+        <div class="camera-view">
+            <img id="camera-4" src="http://210.161.154.170:80/-wvhttp-01-/GetOneShot?image_size=640x480&frame_count=1000000000" alt="Vision 4">
+            <div class="camera-title">Vision 4</div>
+            <div class="camera-timestamp" id="timestamp-4"></div>
+            <div class="camera-location">Tokyo, Japan</div>
+        </div>
+    </div>
+
+    <div class="buttons">
+        <button class="button" onclick="goBack()">Back</button>
+        <button class="button" onclick="goUndercover()">Undercover</button>
+    </div>
+
+    <script>
+        // Starting values of the 'r' parameters for Vision 1 and Vision 3
+        let rValue1 = 1726198492;
+        let rValue3 = 1726199648;
+
+        // Function to update the image for Vision 1 every second
+        function updateCameraImage1() {
+            const camera1 = document.getElementById('camera-1');
+            rValue1++;  // Increment 'r' parameter by 1
+            const newSrc1 = `http://125.17.248.94:8080/cgi-bin/viewer/video.jpg?r=${rValue1}`;
+            camera1.src = newSrc1;
+        }
+
+        // Function to update the image for Vision 3 every second
+        function updateCameraImage3() {
+            const camera3 = document.getElementById('camera-3');
+            rValue3++;  // Increment 'r' parameter by 1
+            const newSrc3 = `http://103.217.216.197:8001/jpg/image.jpg?${rValue3}`;
+            camera3.src = newSrc3;
+        }
+
+        // Function to update the timestamp for all Vision views
+        function updateTimeAndDate() {
+            const now = new Date();
+            const formattedTime = now.toLocaleTimeString('en-US', { hour12: true });
+            const formattedDate = now.toLocaleDateString('en-US', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+            const timestampText = `${formattedTime} | ${formattedDate}`;
+
+            // Update timestamps for all 4 Vision streams
+            document.getElementById('timestamp-1').textContent = timestampText;
+            document.getElementById('timestamp-2').textContent = timestampText;
+            document.getElementById('timestamp-3').textContent = timestampText;
+            document.getElementById('timestamp-4').textContent = timestampText;
+        }
+
+        // Set the image update intervals for Vision 1 and Vision 3
+        setInterval(updateCameraImage1, 1000);  // Update camera image 1 every second
+        setInterval(updateCameraImage3, 1000);  // Update camera image 3 every second
+        setInterval(updateTimeAndDate, 1000);   // Update time and date every second
+
+        // Set initial time and date
+        updateTimeAndDate();
+
+        // Function to handle 'Back' button click
+        function goBack() {
+            window.location.href = 'dashboard.html';  // Redirect to dashboard page
+        }
+
+        // Function to handle 'Undercover' button click
+        function goUndercover() {
+            localStorage.setItem('page_raw', 'cctv.html');  // Update local storage
+            window.location.href = 'undercover.html';       // Redirect to undercover page
+        }
+    </script>
+</body>
+</html>
