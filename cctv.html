@@ -119,20 +119,20 @@
     </style>
 </head>
 <body>
-    <h1>CCTV Monitoring Dashboard</h1>
+    <h1>CCTV Monitoring RAW</h1>
     
     <div class="container">
         <!-- Camera 1 - Dynamic Stream -->
         <div class="camera-view">
-            <img id="camera-1" src="http://125.17.248.94:8080/cgi-bin/viewer/video.jpg?r=1726198492" alt="Vision 1">
+            <img id="camera-1" src="https://erma-stedi-cam.gmd-tg.ch/axis-cgi/mjpg/video.cgi" alt="Vision 1">
             <div class="camera-title">Vision 1</div>
             <div class="camera-timestamp" id="timestamp-1"></div>
-            <div class="camera-location">Maharashtra, India</div>
+            <div class="camera-location">Tranbjerg, Denmark</div>
         </div>
 
         <!-- Camera 2 - Static Stream -->
         <div class="camera-view">
-            <img id="camera-2" src="http://83.91.176.170:80/mjpg/video.mjpg" alt="Vision 2">
+            <img id="camera-2" src="https://herberts.meinekameras.de:10169/axis-cgi/mjpg/video.cgi" alt="Vision 2">
             <div class="camera-title">Vision 2</div>
             <div class="camera-timestamp" id="timestamp-2"></div>
             <div class="camera-location">Tranbjerg, Denmark</div>
@@ -140,7 +140,7 @@
 
         <!-- Camera 3 - Dynamic Stream -->
         <div class="camera-view">
-            <img id="camera-3" src="http://103.217.216.197:8001/jpg/image.jpg?1726199648" alt="Vision 3">
+            <img id="camera-3" src="https://csea-me-webcam.cse.umn.edu/mjpg/video.mjpg" alt="Vision 3">
             <div class="camera-title">Vision 3</div>
             <div class="camera-timestamp" id="timestamp-3"></div>
             <div class="camera-location">Bekasi, Indonesia</div>
@@ -148,10 +148,10 @@
 
         <!-- Camera 4 - Static Stream -->
         <div class="camera-view">
-            <img id="camera-4" src="http://210.161.154.170:80/-wvhttp-01-/GetOneShot?image_size=640x480&frame_count=1000000000" alt="Vision 4">
+            <img id="camera-4" src="https://webcam.caucedo.com:15080/mjpg/1/video.mjpg" alt="Vision 4">
             <div class="camera-title">Vision 4</div>
             <div class="camera-timestamp" id="timestamp-4"></div>
-            <div class="camera-location">Tokyo, Japan</div>
+            <div class="camera-location">Pune, Maharashtra</div>
         </div>
     </div>
 
@@ -166,20 +166,6 @@
         let rValue3 = 1726199648;
 
         // Function to update the image for Vision 1 every second
-        function updateCameraImage1() {
-            const camera1 = document.getElementById('camera-1');
-            rValue1++;  // Increment 'r' parameter by 1
-            const newSrc1 = `http://125.17.248.94:8080/cgi-bin/viewer/video.jpg?r=${rValue1}`;
-            camera1.src = newSrc1;
-        }
-
-        // Function to update the image for Vision 3 every second
-        function updateCameraImage3() {
-            const camera3 = document.getElementById('camera-3');
-            rValue3++;  // Increment 'r' parameter by 1
-            const newSrc3 = `http://103.217.216.197:8001/jpg/image.jpg?${rValue3}`;
-            camera3.src = newSrc3;
-        }
 
         // Function to update the timestamp for all Vision views
         function updateTimeAndDate() {
@@ -199,9 +185,6 @@
             document.getElementById('timestamp-4').textContent = timestampText;
         }
 
-        // Set the image update intervals for Vision 1 and Vision 3
-        setInterval(updateCameraImage1, 1000);  // Update camera image 1 every second
-        setInterval(updateCameraImage3, 1000);  // Update camera image 3 every second
         setInterval(updateTimeAndDate, 1000);   // Update time and date every second
 
         // Set initial time and date
