@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Address Locator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #0ff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+            animation: flicker 1.5s infinite;
+        }
+
+        input {
+            background: #111;
+            border: 2px solid #0ff;
+            color: #0ff;
+            padding: 0.8rem;
+            width: 80%; /* Adjusted for responsiveness */
+            max-width: 300px; /* Max width for larger screens */
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            outline: none;
+        }
+
+        button {
+            background: #0ff;
+            color: #000;
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: #00f;
+            color: #fff;
+        }
+
+        #animation {
+            margin-top: 1.5rem;
+            font-size: 1.2rem;
+            display: none;
+        }
+
+        #map {
+            width: 90%; /* Adjusted for responsiveness */
+            height: 50vh; /* Responsive height */
+            background-color: #222;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/World_map_blank_without_borders.svg/2000px-World_map_blank_without_borders.svg.png');
+            background-size: cover;
+            background-position: center;
+            border: 2px solid #0ff;
+            margin-top: 1rem;
+            display: none;
+            position: relative;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        .ping, .current-location {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .ping {
+            background-color: red;
+            animation: ping 1s ease-out infinite;
+        }
+
+        .current-location {
+            background-color: blue;
+        }
+
+        .tracking-info {
+            margin-top: 1rem;
+            color: #0f0;
+            font-size: 1.5rem;
+            display: none;
+        }
+
+        .direction-arrow {
+            display: none;
+            width: 50px;
+            height: 50px;
+            margin-top: 1rem;
+        }
+
+        .label {
+            font-size: 12px;
+            color: white;
+            text-align: center;
+        }
+
+        @keyframes ping {
+            0% {
+                transform: scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                opacity: 1;
+            }
+            20%, 24%, 55% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* Terminal-like blinking cursor effect */
+        .blinking-cursor {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #0ff;
+            animation: blink 0.8s steps(5, start) infinite;
+        }
+
+        @keyframes blink {
+            to {
+                visibility: hidden;
+            }
+        }
+
+        /* Compass styles */
+        .compass {
+            display: none;
+            margin-top: 1rem;
+            color: #0ff;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            input, button {
+                font-size: 1rem;
+                padding: 0.5rem;
+            }
+
+            .tracking-info {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>IP Address Locator</h1>
+    <input type="text" id="ipAddress" placeholder="Enter IP address" />
+    <br>
+    <button onclick="traceIP()">Trace IP</button>
+
+    <div id="animation">
+        <p>Tracing IP address<span class="blinking-cursor">|</span></p>
+        <p>Triangulating location<span class="blinking-cursor">|</span></p>
+        <p>Location found<span class="blinking-cursor">|</span></p>
+    </div>
+
+    <div id="map">
+        <div class="ping" id="ping">
+            <div class="label">Target</div>
+        </div>
+        <div class="current-location" id="currentLocation">
+            <div class="label">0728</div>
+        </div>
+    </div>
+
+    <div class="tracking-info" id="trackingInfo">
+        Move <span id="distance">50</span> meters towards: <span id="direction">N/A</span>
+    </div>
+
+    <img id="directionArrow" class="direction-arrow" src="black-arrowhead-pointing-up.png" alt="Direction Arrow">
+
+    <div class="compass" id="compassInfo">
+        Current Direction: <span id="compassDirection">N/A</span>
+    </div>
+</div>
+
+<script>
+    let compassInfo = document.getElementById("compassInfo");
+    let compassDirection = document.getElementById("compassDirection");
+    let trackingInfo = document.getElementById("trackingInfo");
+    let directionSpan = document.getElementById("direction");
+    let distanceSpan = document.getElementById("distance");
+    let directionArrow = document.getElementById("directionArrow");
+    let currentLocationDiv = document.getElementById("currentLocation");
+
+    // Store the target's simulated location
+    let targetLat = 37.7749;  // Example coordinates (replace with actual)
+    let targetLng = -122.4194;
+
+    function traceIP() {
+        var ip = document.getElementById("ipAddress").value;
+        if (ip === "") {
+            alert("Please enter an IP address!");
+            return;
+        }
+
+        var animationDiv = document.getElementById("animation");
+        var mapDiv = document.getElementById("map");
+        var pingDiv = document.getElementById("ping");
+
+        // Reset animation text
+        animationDiv.children[0].innerText = "Tracing IP address";
+        animationDiv.children[1].innerText = "Triangulating location";
+        animationDiv.children[2].innerText = "Location found";
+
+        // Show the tracing animation
+        animationDiv.style.display = "block";
+        mapDiv.style.display = "none";
+        trackingInfo.style.display = "none";
+
+        setTimeout(function () {
+            // Update tracing status
+            animationDiv.children[0].innerText = "Tracing IP address... done";
+        }, 1500);
+
+        setTimeout(function () {
+            // Update triangulation status
+            animationDiv.children[1].innerText = "Triangulating location... done";
+        }, 3000);
+
+        setTimeout(function () {
+            // Show location found and map
+            animationDiv.children[2].innerText = "Location found!";
+            mapDiv.style.display = "block";
+
+            // Randomize ping position on the map for effect
+            var mapWidth = mapDiv.offsetWidth;
+            var mapHeight = mapDiv.offsetHeight;
+            var x = Math.random() * (mapWidth - 20);
+            var y = Math.random() * (mapHeight - 20);
+
+            // Set ping position
+            pingDiv.style.left = x + "px";
+            pingDiv.style.top = y + "px";
+
+            // Start tracking location and compass
+            trackingInfo.style.display = "block";
+            updateCompassAndLocation();
+
+        }, 5000);
+    }
+
+    // Get the real-time device orientation and location
+    function updateCompassAndLocation() {
+        // Compass direction logic
+        window.addEventListener('deviceorientation', function(event) {
+            let alpha = event.alpha; // Rotation around z-axis
+            let direction = '';
+
+            if (alpha >= 337.5 || alpha < 22.5) direction = 'North';
+            else if (alpha >= 22.5 && alpha < 67.5) direction = 'North-East';
+            else if (alpha >= 67.5 && alpha < 112.5) direction = 'East';
+            else if (alpha >= 112.5 && alpha < 157.5) direction = 'South-East';
+            else if (alpha >= 157.5 && alpha < 202.5) direction = 'South';
+            else if (alpha >= 202.5 && alpha < 247.5) direction = 'South-West';
+            else if (alpha >= 247.5 && alpha < 292.5) direction = 'West';
+            else if (alpha >= 292.5 && alpha < 337.5) direction = 'North-West';
+
+            compassDirection.innerText = direction;
+            directionArrow.style.transform = `rotate(${alpha}deg)`; // Update arrow rotation
+            directionArrow.style.display = "block";
+            compassInfo.style.display = "block";
+        });
+
+        // Geolocation tracking to get real-time movement
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(function(position) {
+                let currentLat = position.coords.latitude;
+                let currentLng = position.coords.longitude;
+
+                // Move the blue dot (current location) on the map
+                let mapWidth = document.getElementById('map').offsetWidth;
+                let mapHeight = document.getElementById('map').offsetHeight;
+                let x = ((currentLng + 180) * (mapWidth / 360)) - 10; // Adjust for dot size
+                let y = ((90 - currentLat) * (mapHeight / 180)) - 10; // Adjust for dot size
+
+                // Ensure the current location dot stays within the map boundaries
+                x = Math.max(10, Math.min(x, mapWidth - 30));
+                y = Math.max(10, Math.min(y, mapHeight - 30));
+
+                currentLocationDiv.style.left = x + "px";
+                currentLocationDiv.style.top = y + "px";
+
+                // Calculate distance to the target using Haversine formula
+                let distance = calculateDistance(currentLat, currentLng, targetLat, targetLng);
+                distanceSpan.innerText = Math.round(distance); // Display distance
+
+                // Simulate random movement direction
+                directionSpan.innerText = ["North", "South", "East", "West", "South-East", "South-West", "North-East", "North-West"][Math.floor(Math.random() * 8)];
+            }, function(error) {
+                console.error("Error occurred while retrieving location: ", error);
+            });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    // Calculate the distance between two coordinates using Haversine formula
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        var R = 6371e3; // metres
+        var φ1 = lat1 * Math.PI/180;
+        var φ2 = lat2 * Math.PI/180;
+        var Δφ = (lat2-lat1) * Math.PI/180;
+        var Δλ = (lon2-lon1) * Math.PI/180;
+
+        var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                Math.cos(φ1) * Math.cos(φ2) *
+                Math.sin(Δλ/2) * Math.sin(Δλ/2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+        var d = R * c; // in meters
+        return d;
+    }
+</script>
+
+</body>
+</html>
