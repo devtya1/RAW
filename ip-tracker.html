@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IP Address Locator</title>
+    <title>IP Address Locator with Compass</title>
     <style>
         body {
             margin: 0;
@@ -284,9 +284,10 @@
     function updateCompassAndLocation() {
         // Compass direction logic
         window.addEventListener('deviceorientation', function(event) {
-            let alpha = event.alpha; // Rotation around z-axis
-            let direction = '';
-
+            let alpha = event.alpha; // Rotation around Z axis (0 is North)
+            
+            // Determine compass direction based on alpha value
+            let direction = 'N/A';
             if (alpha >= 337.5 || alpha < 22.5) direction = 'North';
             else if (alpha >= 22.5 && alpha < 67.5) direction = 'North-East';
             else if (alpha >= 67.5 && alpha < 112.5) direction = 'East';
@@ -325,8 +326,8 @@
                 let distance = calculateDistance(currentLat, currentLng, targetLat, targetLng);
                 distanceSpan.innerText = Math.round(distance); // Display distance
 
-                // Simulate random movement direction
-                directionSpan.innerText = ["North", "South", "East", "West", "South-East", "South-West", "North-East", "North-West"][Math.floor(Math.random() * 8)];
+                // Set the direction based on real orientation
+                // The actual direction is handled by device orientation now.
             }, function(error) {
                 console.error("Error occurred while retrieving location: ", error);
             });
